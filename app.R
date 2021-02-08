@@ -3,8 +3,31 @@
 # Attach libraries
 library(shiny)
 library(tidyverse)
+library(bslib)
 
-ui <- fluidPage(#themewillgohere!= "blankity_blank.css",
+dark_theme <- bs_theme(
+  bg = "#26428B",
+  fg = "#FFFAF0",
+  primary = "#E8CCD7",
+  base_font = font_google("Roboto"),
+  heading_font = font_google("Cinzel"))
+
+light_theme <- bs_theme(
+  bg = "#FFFAF0",
+  fg = "#26428B",
+  primary = "#8CBED6",
+  base_font = font_google("Roboto"),
+  heading_font = font_google("Cinzel"))
+
+white_back_theme <- bs_theme(
+  bg = "white",
+  fg = "#26428B",
+  primary = "#8CBED6",
+  base_font = font_google("Roboto"),
+  heading_font = font_google("Alegreya Sans SC"))
+
+ui <- fluidPage(theme = white_back_theme,
+                
                 navbarPage("Carbon Counters: Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands",
                            tabPanel("Introduction",
                                     titlePanel(
