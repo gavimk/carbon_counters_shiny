@@ -26,7 +26,7 @@ white_back_theme <- bs_theme(
   base_font = font_google("Roboto"),
   heading_font = font_google("Alegreya Sans SC"))
 
-ui <- fluidPage(theme = white_back_theme,
+ui <- fluidPage(theme = dark_theme,
                 
                 navbarPage("Carbon Counters: Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands",
                            tabPanel("Introduction",
