@@ -36,7 +36,7 @@ ui <- fluidPage(theme = dark_theme,
                                               "Acknowledging that these lands can play a significant role in reducing emissions, the County of Santa Barbara is now adding a Natural and Working Lands component to the 2022 update of its Climate Action Plan. Our team’s role in addressing this problem is to quantify the carbon storage potential of these lands, and help integrate that information into county planning for increased carbon storage into the future.
 ",
                                               h3("as always a photo of farm stuff"),
-                                              img(src = "farms1.jpg"), #image not working
+                                              img(src = "farms1.jpg", height = 400, width = 600), #image not working
                                               
                                               h2("Project Objectives"),
                                               "1. Calculate a Countywide carbon inventory by accounting for carbon (stock) storage and emissions associated with Santa Barbara County’s natural and working lands.\n 2. Project land use change and resulting carbon stock and emissions, using a baseline trend from historical data. \n 3. Engage the agricultural community to ensure our modeling and recommendations are based in reality. \n 4. Assess the changes to forecasted stock and emissions from different land management scenarios. \n  5. Recommend realistic greenhouse gas reduction and management strategies to the County.",
