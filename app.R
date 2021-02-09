@@ -6,11 +6,11 @@ library(tidyverse)
 library(bslib)
 
 dark_theme <- bs_theme(
-  bg = "#26428B",
+  bg = "#053d57",
   fg = "#FFFAF0",
   primary = "#E8CCD7",
   base_font = font_google("Roboto"),
-  heading_font = font_google("Cinzel"))
+  heading_font = font_google("Arvo"))
 
 light_theme <- bs_theme(
   bg = "#FFFAF0",
