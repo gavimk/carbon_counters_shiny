@@ -1,0 +1,79 @@
+---
+title: "Carbon Counters Shiny App"
+author: "Minnie Ringland, Alicia Fennell, Gavriella Keyles"
+date: "2/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(sf) # for spatial data
+library(tmap) # for interactive maps
+```
+
+```{r}
+# Carbon Inventory
+# dummy data for now - color coding by land type
+
+ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
+
+ca_subset <- ca_counties %>% 
+  select(NAME, ALAND) %>% 
+  rename(county_name = NAME, land_area = ALAND)
+
+# Set viewing mode to "interactive":
+tmap_mode(mode = "view")
+
+tm_shape(ca_subset) +
+  tm_fill("land_area", palette = "Blues", title="Land area (sq meters)") +
+  tm_borders(col = "white", lwd = 0.5) +
+  tm_scale_bar()
+
+```
+
+```{r}
+# Projection
+# dummy dataset
+
+matrix <- data.frame("year" = c(2016,2030),
+                     "Acreage" = c(1, 1.3),
+                     "Carbon" = c(2, 1.8),
+                     "N2O" = c(3, 2.5)
+                     )
+
+ggplot(data = matrix) +
+    geom_col(aes(x=year, y = N2O, fill = year))
+
+```
+
+
+```{r}
+# Carbon-Smart Management Practices
+
+#matrix_mgmt <- matrix %>% 
+#  mutate("Composting" = c(0.5,0.5),
+#        "Cover Cropping" = c(1.5, 1.5),
+#       "Restoration" = c(5,5)) %>% 
+#mutate("new" = Composting*Acreage*(50/100))
+
+#ggplot(data = matrix_mgmt) +
+#  geom_col(aes(x=year, y = new))
+
+```
+
+```{r}
+# Barriers to Implementation
+barriers <- read_csv(here("data","barriers.csv"))
+
+test <- barriers %>% 
+  filter(barrier %in% "Cost/Funding")
+
+```
+
+
+
+
+
