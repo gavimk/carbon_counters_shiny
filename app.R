@@ -1,6 +1,4 @@
-# Welcome to the Carbon Counters shiny app! Made by Gavriella Keyles, Alicia Fennell and Minnie Ringland. This app is part of the Carbon Counters Master's Group Project at the UCSB Bren School of Environmental Science and Management. 
-
-# Attach libraries
+### Attach libraries
 library(shiny)
 library(tidyverse)
 library(bslib)
@@ -11,7 +9,8 @@ library(leaflet)
 library(tmaptools)
 library(mapview)
 
-# Set themes
+
+### Set themes
 dark_theme <- bs_theme(
   bg = "#053d57",
   fg = "#FFFAF0",
@@ -34,15 +33,16 @@ white_back_theme <- bs_theme(
   heading_font = font_google("Alegreya Sans SC"))
 
 
-# User Interface
+### User Interface
 
 ui <- fluidPage(theme = dark_theme,
                 
                 navbarPage("Carbon Counters: Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands",
+                           
                            tabPanel("Home",
-                                    titlePanel(
-                                               "Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
-                                    mainPanel(align = "left", br(),
+                                    titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
+                                    mainPanel(align = "left",
+                                              br(),
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
@@ -70,42 +70,39 @@ ui <- fluidPage(theme = dark_theme,
                                     "State targets of reaching 40% below 1990 emissions levels by 2030, and reaching carbon neutrality by 2045. Santa Barbara County has set an equivalent target for 2030, to reduce emissions 50% below 2007 levels.",
                                     br(),
                                     br(),
-                                    img(src = "CountyMap.gif", height = 500, width = 700),
-                                    )),
+                                    img(src = "CountyMap.gif", height = 500, width = 700)
+                                   )),
                            
                            # First Tab
                            tabPanel("Carbon Inventory",
                                     sidebarLayout(
-                                      sidebarPanel(h3("Landcover Category"),
+                                      sidebarPanel(h4("Landcover Category"),
+                                                   br(),
                                                    checkboxGroupInput(inputId = "select_landcover",
                                                                       label = "Select one or more:",
-                                                                      #choices = unique(inventory$land_class))
+                                                                      br(),
+                                                                      #choices = unique(inventory$land_class)
                                                                       choices = list("Orchard" = 1,
                                                                                      "Vineyard" = 2,
                                                                                      "Row Crop" = 3,
                                                                                      "Rangeland" = 4)),
                                       ),
-                                      mainPanel(h2("Land Cover, Carbon Stocks & Emissions in 2016"),
+                                      mainPanel(h3("Land Cover, Carbon Stocks & Emissions in 2016"),
                                                 leafletOutput("ci_plot")
                                       )
                                     )),
                            
                            # Second Tab
-                           tabPanel("Working Lands in 2030",
-                                    fluidRow(
-                                      column(5,
-                                             "not sure how",
-                                             radioButtons("project_var", 
-                                                          label = "Select Variable",
-                                                          choices = list("Acreage"=1,
-                                                                         "Carbon Stock"=2,
-                                                                         "N2O Emissions"=3)
-                                                          )
-                                      ),
-                                      column(5,
-                                             "this tab will look"
-                                      ),
-                                      mainPanel(h2("Our linear regression estimates this is what the County's working lands will look like in 2030"),
+                           tabPanel("Project to 2030",
+                                    sidebarLayout(
+                                      sidebarPanel(h4("Working Lands in 2030"),
+                                                   radioButtons("project_var",
+                                                                label = "Select Variable",
+                                                                choices = list("Acreage"=1,
+                                                                               "Carbon Stock"=2,
+                                                                               "N2O Emissions"=3)),
+                                                   ),
+                                      mainPanel(h3("Our linear regression estimates this is what the County's working lands will look like in 2030"),
                                                 plotOutput("projection_plot")
                                       )
                                     )),
@@ -113,19 +110,19 @@ ui <- fluidPage(theme = dark_theme,
                            # Third Tab
                            tabPanel("Carbon-Smart Management Practices",
                                     sidebarLayout(
-                                      sidebarPanel("Carbon-Smart Management Practices",
+                                      sidebarPanel(
                                                    checkboxGroupInput(inputId = "select_practice",
-                                                                      label = h3("Choose a management practice to learn more:"),
+                                                                      label = h4("Choose a management practice to learn more:"),
                                                                       choices = list("Composting" = 1,
                                                                                      "Cover Cropping" = 2,
                                                                                      "Restoration" = 3)
                                                                       #choices = unique(practices$carbon)
                                                    ),
-                                                   
-                                                   sliderInput("acres_slide", label = h3("Percent of 2030 Acreage"), min = 0, 
+                                                   hr(),
+                                                   sliderInput("acres_slide", label = h4("Percent of 2030 Acreage"), min = 0, 
                                                                max = 100, value = 50)
                                       ),
-                                      mainPanel("Management Practices - Carbon Storage & Emissions Impacts",
+                                      mainPanel(h3("Management Practices - Carbon Storage & Emissions Impacts"),
                                                 plotOutput("impact_plot")
                                       )
                                     )),
@@ -134,45 +131,46 @@ ui <- fluidPage(theme = dark_theme,
                            tabPanel("Barriers to Implementation",
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
-                                                               label = h3("Select a barrier"),
+                                                               label = h4("Select a barrier"),
                                                                choices = list("Cost/Funding",
                                                                               "Regulatory/Permitting",
                                                                               "Education",
                                                                               "Time",
                                                                               "Other"),
                                                                selected = "Cost/Funding")),
-                                      mainPanel("See what other land managers have said, and add your own comments",
+                                      mainPanel(h3("See what other land managers have said, and add your own comments"),
                                       br(),
                                       br(),
                                       "These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
                                       br(),
                                       br(),
-                                      tableOutput("selected_barrier") # issue with some options not being valid
+                                      tableOutput("selected_barrier"), # issue with some options not being valid
                                       )
                                     )),
                            
                            # Fifth Tab
                            tabPanel("Carbon Counters",
                                     mainPanel(h2("Meet the team"),
-                                              "Alicia Fennell",
                                               br(),
-                                              "Gavi Keyles",
+                                              h4("Alicia Fennell"),
                                               br(),
-                                              "Madi Oliver",
+                                             h4("Gavi Keyles"),
                                               br(),
-                                              "Minnie Ringland",
+                                              h4("Madi Oliver"),
                                               br(),
-                                              "Michael Wells"
+                                              h4("Minnie Ringland"),
+                                              br(),
+                                              h4("Michael Wells")
                                               )
                                     )
-                )
+                           )
 )
 
 
-# Server Interface
+### Server Interface
 server <- function(input, output) {
   
-  # inventory code
+  ## inventory code
   ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
   
   ca_subset <- ca_counties %>% 
@@ -188,33 +186,38 @@ server <- function(input, output) {
     tmap_leaflet(map)
   })
   
-  # projection code
+  
+  ## projection code
+  matrix <- data.frame("year" = c(2016,2030),
+                       "Acreage" = c(1, 1.3),
+                       "Carbon" = c(2, 1.8),
+                       "N2O" = c(3, 2.5))
+  
   output$projection_plot <- renderPlot({
     ggplot(data = matrix) +
       geom_col(aes(x=year, y = input$project_var, fill = year))
   })
   
-  # mgmt practices code
+  
+  ## mgmt practices code
   mgmt_reactive <- reactive ({
-    
-    matrix <- data.frame("year" = c(2016,2030),
-                         "Acreage" = c(1, 1.3),
-                         "Carbon" = c(2, 1.8),
-                         "N2O" = c(3, 2.5)
-    )
     matrix_mgmt <- matrix %>% 
     mutate("Composting" = c(0.5,0.5),
            "Cover Cropping" = c(1.5, 1.5),
            "Restoration" = c(5,5)) %>% 
     mutate("new" = input$select_practice*Acreage*(input$acres_slide/100))
-  })
+   })
   
   output$impact_plot <- renderPlot({
     ggplot(data = matrix_mgmt) +
     geom_col(aes(x=year, y = new))
+      geom_col(aes(x=year, y = new))
   })
   
-  # barriers code
+  
+  ## barriers code
+  barriers <- read_csv(here("data","barriers.csv"))
+  
   output$selected_barrier <- renderTable({
     barriers %>% 
       filter(barrier == input$select_barrier)

@@ -53,6 +53,7 @@ ggplot(data = matrix) +
 ```{r}
 # Carbon-Smart Management Practices
 
+
 matrix_mgmt <- matrix %>% 
   mutate("Composting" = c(0.5,0.5),
         "Cover Cropping" = c(1.5, 1.5),
@@ -61,6 +62,16 @@ mutate("new" = Composting*Acreage*(50/100))
 
 ggplot(data = matrix_mgmt) +
   geom_col(aes(x=year, y = new))
+
+#matrix_mgmt <- matrix %>% 
+#  mutate("Composting" = c(0.5,0.5),
+#        "Cover Cropping" = c(1.5, 1.5),
+#       "Restoration" = c(5,5)) %>% 
+#mutate("new" = Composting*Acreage*(50/100))
+
+#ggplot(data = matrix_mgmt) +
+#  geom_col(aes(x=year, y = new))
+
 
 ```
 
