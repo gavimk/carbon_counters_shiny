@@ -113,17 +113,20 @@ ui <- fluidPage(theme = dark_theme,
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "select_practice",
                                                                       label = h4("Choose a management practice to learn more:"),
-                                                                      choices = list("Composting" = 1,
-                                                                                     "Cover Cropping" = 2,
-                                                                                     "Restoration" = 3)
+                                                                      choices = list("Composting",
+                                                                                     "Cover Cropping",
+                                                                                     "Restoration")
                                                                       #choices = unique(practices$carbon)
                                                    ),
                                                    hr(),
-                                                   sliderInput("acres_slide", label = h4("Percent of 2030 Acreage"), min = 0, 
-                                                               max = 100, value = 50)
+                                                   sliderInput("acres_slide",
+                                                               label = h4("Percent of 2030 Acreage"),
+                                                               min = 0, 
+                                                               max = 100,
+                                                               value = 50)
                                       ),
                                       mainPanel(h3("Management Practices - Carbon Storage & Emissions Impacts"),
-                                                plotOutput("impact_plot")
+                                                plotOutput("impact_plot") # broken! help!
                                       )
                                     )),
                            
@@ -132,13 +135,14 @@ ui <- fluidPage(theme = dark_theme,
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
                                                                label = h4("Select a barrier"),
-                                                               choices = list("Cost/Funding",
-                                                                              "Regulatory/Permitting",
-                                                                              "Education",
+                                                               choices = list("Education",
                                                                               "Time",
-                                                                              "Other"),
-                                                               selected = "Cost/Funding")),
-                                      mainPanel(h3("See what other land managers have said, and add your own comments"),
+                                                                              "Cost/Funding",
+                                                                              "Regulatory/Permitting",
+                                                                              "Other")
+                                                               )
+                                                   ),
+                                      mainPanel(h3("See what other land managers have said, and add your own comments?"),
                                       br(),
                                       br(),
                                       "These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
@@ -177,7 +181,7 @@ server <- function(input, output) {
     select(NAME, ALAND) %>% 
     rename(county_name = NAME, land_area = ALAND)
   
-  mycols <- c("blue","green","red","purple") # colors not working
+  mycols <- c("blue", "red", "green", "purple") # colors not working
   
   output$ci_plot <- renderLeaflet({
     map <- tm_shape(ca_subset) +
@@ -188,30 +192,33 @@ server <- function(input, output) {
   
   
   ## projection code
-  matrix <- data.frame("year" = c(2016,2030),
-                       "Acreage" = c(1, 1.3),
-                       "Carbon" = c(2, 1.8),
-                       "N2O" = c(3, 2.5))
+  projection <- read_csv(here("data","projections.csv"))
+  
+  proj_reactive <- reactive ({
+    projection %>% 
+      filter(type == input$project_var)
+  })
   
   output$projection_plot <- renderPlot({
-    ggplot(data = matrix) +
-      geom_col(aes(x=year, y = input$project_var, fill = year))
+    ggplot(data = proj_reactive()) +
+      geom_point(aes(x = year, y = val, color = year),size = 3)
   })
   
   
   ## mgmt practices code
   mgmt_reactive <- reactive ({
-    matrix_mgmt <- matrix %>% 
-    mutate("Composting" = c(0.5,0.5),
-           "Cover Cropping" = c(1.5, 1.5),
-           "Restoration" = c(5,5)) %>% 
-    mutate("new" = input$select_practice*Acreage*(input$acres_slide/100))
+    projection %>%
+      pivot_wider(names_from = type, values_from = val) %>%
+      rename("Acreage"=2, "Carbon"=3, "N2O Emissions"=4) %>%
+      mutate("Composting" = Acreage*0+0.5,
+             "Cover" = Acreage*0+01.5,
+             "Restoration" = Acreage*0+5) %>% 
+      mutate(newcol = matrix(input$select_practice*Acreage*input$acres_slide/100),11)
    })
   
   output$impact_plot <- renderPlot({
-    ggplot(data = matrix_mgmt) +
-    geom_col(aes(x=year, y = new))
-      geom_col(aes(x=year, y = new))
+    ggplot(data = mgmt_reactive()) +
+    geom_col(aes(x=year, y = newcol))
   })
   
   
