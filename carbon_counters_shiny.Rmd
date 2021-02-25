@@ -69,6 +69,11 @@ mgmt <- projection %>%
   mutate(newcol = Cover*Carbon*5/100)
  
 
+mgmt_practices <- read_csv(here("data","mgmt_practices.csv")) %>% 
+  filter(practice == "a")
+
+ggplot(data = mgmt_practices) +
+  geom_col(aes(x=year,y=new))
 
 ```
 
