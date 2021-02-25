@@ -173,6 +173,12 @@ ui <- fluidPage(theme = dark_theme,
 server <- function(input, output) {
   
   # inventory code
+  ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
+  
+  ca_subset <- ca_counties %>% 
+    select(NAME, ALAND) %>% 
+    rename(county_name = NAME, land_area = ALAND)
+  
   mycols <- c("blue","green","red","purple") # colors not working
   
   output$ci_plot <- renderLeaflet({
@@ -190,6 +196,12 @@ server <- function(input, output) {
   
   # mgmt practices code
   mgmt_reactive <- reactive ({
+    
+    matrix <- data.frame("year" = c(2016,2030),
+                         "Acreage" = c(1, 1.3),
+                         "Carbon" = c(2, 1.8),
+                         "N2O" = c(3, 2.5)
+    )
     matrix_mgmt <- matrix %>% 
     mutate("Composting" = c(0.5,0.5),
            "Cover Cropping" = c(1.5, 1.5),
