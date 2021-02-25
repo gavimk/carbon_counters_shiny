@@ -44,8 +44,13 @@ matrix <- data.frame("year" = c(2016,2030),
                      "N2O" = c(3, 2.5)
                      )
 
+matrix2 <- matrix %>% 
+  select(year,Acreage) %>% 
+  rename(new=Acreage)
+
 ggplot(data = matrix) +
     geom_col(aes(x=year, y = N2O, fill = year))
+
 
 ```
 
@@ -53,24 +58,16 @@ ggplot(data = matrix) +
 ```{r}
 # Carbon-Smart Management Practices
 
+projection <- read_csv(here("data","projections.csv"))
 
-matrix_mgmt <- matrix %>% 
-  mutate("Composting" = c(0.5,0.5),
-        "Cover Cropping" = c(1.5, 1.5),
-       "Restoration" = c(5,5)) %>% 
-mutate("new" = Composting*Acreage*(50/100))
-
-ggplot(data = matrix_mgmt) +
-  geom_col(aes(x=year, y = new))
-
-#matrix_mgmt <- matrix %>% 
-#  mutate("Composting" = c(0.5,0.5),
-#        "Cover Cropping" = c(1.5, 1.5),
-#       "Restoration" = c(5,5)) %>% 
-#mutate("new" = Composting*Acreage*(50/100))
-
-#ggplot(data = matrix_mgmt) +
-#  geom_col(aes(x=year, y = new))
+mgmt <- projection %>%
+  pivot_wider(names_from = type, values_from = val) %>% 
+  rename("Acreage"=2, "Carbon"=3, "N2O Emissions"=4) %>% 
+  mutate("Composting" = matrix(0.5,11),
+           "Cover" = matrix(1.5,11),
+           "Restoration" = matrix(5,11)) %>% 
+  mutate(newcol = Cover*Carbon*5/100)
+ 
 
 
 ```
