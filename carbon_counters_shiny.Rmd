@@ -72,6 +72,11 @@ ggplot(data = mgmt) +
     geom_col(aes(x=year, y = newcol))
  
 
+mgmt_practices <- read_csv(here("data","mgmt_practices.csv")) %>% 
+  filter(practice == "a")
+
+ggplot(data = mgmt_practices) +
+  geom_col(aes(x=year,y=new))
 
 ```
 

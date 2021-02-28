@@ -39,6 +39,7 @@ ui <- fluidPage(theme = dark_theme,
                 
                navbarPage("CARBON COUNTERS",
    ## I think it looks a little cleaner with a short title or no title - thoughts? 
+   ## Minnie - yes this looks better
    ### Carbon Counters: Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands
                            
                            tabPanel("Home",
@@ -115,9 +116,9 @@ ui <- fluidPage(theme = dark_theme,
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "select_practice",
                                                                       label = h4("Choose a management practice to learn more:"),
-                                                                      choices = list("Composting",
-                                                                                     "Cover Cropping",
-                                                                                     "Restoration")
+                                                                      choices = list("Composting"="a",
+                                                                                     "Cover Cropping"="b",
+                                                                                     "Restoration"="c")
                                                                       #choices = unique(practices$carbon)
                                                    ),
                                                    hr(),
@@ -229,19 +230,26 @@ server <- function(input, output) {
   })
   
   ## mgmt practices code
-  mgmt_reactive <- reactive ({
-    projection %>%
-      pivot_wider(names_from = type, values_from = val) %>%
-      rename("Acreage"=2, "Carbon"=3, "N2O Emissions"=4) %>%
-      mutate("Composting" = Acreage*0+0.5,
-             "Cover" = Acreage*0+01.5,
-             "Restoration" = Acreage*0+5) %>% 
-      mutate(newcol = (input$select_practice*Acreage*input$acres_slide/100))
+  mgmt_practices <- read_csv(here("data","mgmt_practices.csv"))
+  
+ # mgmt_reactive <- reactive ({
+
+   # projection %>%
+    #  pivot_wider(names_from = type, values_from = val) %>%
+     # rename("Acreage"=2, "Carbon"=3, "N2O Emissions"=4) %>%
+      #mutate("Composting" = Acreage*0+0.5,
+       #      "Cover" = Acreage*0+01.5,
+        #     "Restoration" = Acreage*0+5) %>% 
+    #  mutate(newcol = (input$select_practice*Acreage*input$acres_slide/100))
+   # mgmt_practices %>%
+      #mutate(newcol = matrix(input$select_practice*Acreage*input$acres_slide/100),11)
+    #  filter(practice == input$select_practice)
+
    })
   
   output$impact_plot <- renderPlot({
     ggplot(data = mgmt_reactive()) +
-    geom_col(aes(x=year, y = newcol))
+    geom_col(aes(x=year, y = new*input$acres_slide))
   })
   
   
