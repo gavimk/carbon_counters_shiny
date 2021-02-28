@@ -91,7 +91,20 @@ test <- barriers %>%
 
 # Build inputs for projection
 
+project_obs <- read_csv(here("data", "shiny_observed_30.csv"))
 
+project_pred <- read_csv(here("data", "shiny_predict_30.csv"))
+
+plot_project_react <- ggplot() +
+ geom_line(data = subset(rev_plot_predict, variable == input$select_variable), aes(x = year, y = value, group = land_class, color = land_class), size = .8, linetype = "dashed") +
+  geom_point(data = subset(tstock_plot_all, variable == input$select_variable), aes(x = year, y = value, group = land_class, color = land_class), size = 3.6) +
+  theme_minimal() +
+  scale_color_manual(values = c("lightsteelblue", "goldenrod", "lightslategrey", "darkred", "sandybrown", "darkolivegreen3", "green4", "cornflowerblue", "purple4")) +
+  labs(color = "Land Class",
+       y = input$variable,
+       x = "") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = c(2012, 2016, 2019, 2030), labels = c("'12", "'16", "'19", "'30"))
 ```
 
 
