@@ -213,7 +213,7 @@ server <- function(input, output) {
       mutate("Composting" = Acreage*0+0.5,
              "Cover" = Acreage*0+01.5,
              "Restoration" = Acreage*0+5) %>% 
-      mutate(newcol = matrix(input$select_practice*Acreage*input$acres_slide/100),11)
+      mutate(newcol = (input$select_practice*Acreage*input$acres_slide/100))
    })
   
   output$impact_plot <- renderPlot({

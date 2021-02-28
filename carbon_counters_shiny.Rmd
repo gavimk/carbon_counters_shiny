@@ -67,6 +67,9 @@ mgmt <- projection %>%
            "Cover" = matrix(1.5,11),
            "Restoration" = matrix(5,11)) %>% 
   mutate(newcol = Cover*Carbon*5/100)
+
+ggplot(data = mgmt) +
+    geom_col(aes(x=year, y = newcol))
  
 
 
