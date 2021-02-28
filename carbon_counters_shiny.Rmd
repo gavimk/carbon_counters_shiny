@@ -12,6 +12,8 @@ library(tidyverse)
 library(here)
 library(sf) # for spatial data
 library(tmap) # for interactive maps
+library(janitor)
+library(wesanderson)
 ```
 
 ```{r}
@@ -72,11 +74,6 @@ ggplot(data = mgmt) +
     geom_col(aes(x=year, y = newcol))
  
 
-mgmt_practices <- read_csv(here("data","mgmt_practices.csv")) %>% 
-  filter(practice == "a")
-
-ggplot(data = mgmt_practices) +
-  geom_col(aes(x=year,y=new))
 
 ```
 
@@ -112,4 +109,40 @@ plot_project_react <- ggplot() +
   scale_x_continuous(breaks = c(2012, 2016, 2019, 2030), labels = c("'12", "'16", "'19", "'30"))
 ```
 
+```{r}
+
+# Build inputs for management scenarios
+
+mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
+  clean_names() %>% 
+  select(-2) %>% 
+  rename_at(.vars = vars(starts_with("x")),
+            .funs = funs(sub("x", "", .))) %>% 
+  pivot_longer(cols = 2:16, 
+               names_to = "year",
+               values_to = "carbon_stock") %>% 
+  separate(scenarios, sep = " - ", c("practice", "level"))
+
+mgmt_practice <- mgmt_xl %>% 
+  slice(-(1:15)) %>% 
+  drop_na()
+
+baseline <- mgmt_xl %>% 
+  slice(1:15) %>% 
+  select(!level)
+
+wes_colors <- wes_palette("Darjeeling1", 7, type = "continuous")
+
+ggplot() +
+  geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
+  geom_smooth(data = mgmt_practice, aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
+  theme_minimal() + 
+  scale_color_manual(values = wes_colors) +
+  labs(x = "Year",
+       y = "Carbon Stock (million MT C)",
+       color = "Management Practice",
+       linetype = "Implementation Level")
+  
+
+```
 
