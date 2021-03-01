@@ -8,6 +8,8 @@ library(tmap) # for interactive maps
 library(leaflet)
 library(tmaptools)
 library(mapview)
+library(janitor)
+library(wesanderson)
 
 
 ########## Set themes
