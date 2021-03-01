@@ -114,22 +114,29 @@ ui <- fluidPage(theme = dark_theme,
                            tabPanel("Carbon-Smart Management Practices",
                                     sidebarLayout(
                                       sidebarPanel(
-                                                   checkboxGroupInput(inputId = "select_practice",
-                                                                      label = h4("Choose a management practice to learn more:"),
-                                                                      choices = list("Composting"="a",
-                                                                                     "Cover Cropping"="b",
-                                                                                     "Restoration"="c")
-                                                                      #choices = unique(practices$carbon)
+                                                   checkboxGroupInput(inputId = "practice",
+                                                                      label = h4("Choose a Management Practice:"),
+                                                                      choices = list("Reduced Till",
+                                                                                      "Restoration",
+                                                                                      "Mulching",
+                                                                                      "Cover Crops",
+                                                                                      "Hedgerow Planting" = "Hedgerow",
+                                                                                      "Compost",
+                                                                                      "Tree/Shrub Establishment")
                                                    ),
                                                    hr(),
-                                                   sliderInput("acres_slide",
-                                                               label = h4("Percent of 2030 Acreage"),
-                                                               min = 0, 
-                                                               max = 100,
-                                                               value = 50)
+                                                   radioButtons(inputId = "level",
+                                                                label = h4("Select Implementation Level:"),
+                                                                choices = list("High",
+                                                                               "Low")),
+                                                   #sliderInput("acres_slide",
+                                                               # label = h4("Percent of 2030 Acreage"),
+                                                               # min = 0, 
+                                                               # max = 100,
+                                                               # value = 50)
                                       ),
-                                      mainPanel(h3("Management Practices - Carbon Storage & Emissions Impacts"),
-                                                plotOutput("impact_plot") # broken! help!
+                                      mainPanel(h3("Management Practices - Carbon Stock Change Over Time"),
+                                                plotOutput("output$mgmt_plot") # broken! help!
                                       )
                                     )),
                            
@@ -230,27 +237,43 @@ server <- function(input, output) {
   })
   
   ## mgmt practices code
-  mgmt_practices <- read_csv(here("data","mgmt_practices.csv"))
+  mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
+    clean_names() %>% 
+    select(-2) %>% 
+    rename_at(.vars = vars(starts_with("x")),
+              .funs = funs(sub("x", "", .))) %>% 
+    pivot_longer(cols = 2:16, 
+                 names_to = "year",
+                 values_to = "carbon_stock") %>% 
+    separate(scenarios, sep = " - ", c("practice", "level"))
   
- # mgmt_reactive <- reactive ({
-
-   # projection %>%
-    #  pivot_wider(names_from = type, values_from = val) %>%
-     # rename("Acreage"=2, "Carbon"=3, "N2O Emissions"=4) %>%
-      #mutate("Composting" = Acreage*0+0.5,
-       #      "Cover" = Acreage*0+01.5,
-        #     "Restoration" = Acreage*0+5) %>% 
-    #  mutate(newcol = (input$select_practice*Acreage*input$acres_slide/100))
-   # mgmt_practices %>%
-      #mutate(newcol = matrix(input$select_practice*Acreage*input$acres_slide/100),11)
-    #  filter(practice == input$select_practice)
-
-   })
+  mgmt_practice <- mgmt_xl %>% 
+    slice(-(1:15)) %>% 
+    drop_na()
   
-  output$impact_plot <- renderPlot({
-    ggplot(data = mgmt_reactive()) +
-    geom_col(aes(x=year, y = new*input$acres_slide))
-  })
+  mgmt_practice_react <- reactive({ 
+    mgmt_practice %>% 
+      filter(practice == input$practice) %>% 
+      filter(level == input$level)
+    })
+  
+  baseline <- mgmt_xl %>% 
+    slice(1:15) %>% 
+    select(!level)
+  
+  wes_colors <- wes_palette("Darjeeling1", 7, type = "continuous")
+  
+  output$mgmt_plot <- renderPlot({
+    ggplot() +
+    geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
+    geom_smooth(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
+    theme_minimal() + 
+    scale_color_manual(values = wes_colors) +
+    labs(x = "Year",
+         y = "Carbon Stock (million MT C)",
+         color = "Management Practice",
+         linetype = "Implementation Level") 
+    })
   
   
   ## barriers code
