@@ -24,23 +24,17 @@ dark_theme <- bs_theme(
   heading_font = font_google("Arvo"))
 
 light_theme <- bs_theme(
-  bg = "#FFFAF0",
-  fg = "#26428B",
-  primary = "#8CBED6",
-  base_font = font_google("Roboto"),
-  heading_font = font_google("Cinzel"))
-
-white_back_theme <- bs_theme(
   bg = "white",
-  fg = "#26428B",
-  primary = "#8CBED6",
+  fg = "#053d57",
+  primary = "#053d57",
   base_font = font_google("Roboto"),
-  heading_font = font_google("Alegreya Sans SC"))
+  heading_font = font_google("Arvo"))
 
 
 ### User Interface
 
-ui <- fluidPage(theme = dark_theme,
+ui <- fluidPage(theme = light_theme,
+                ### Thoughts on white background vs dark theme? I think the graphs look a little awkward against the dark background but I'm down for whatever. 
                 
                navbarPage("CARBON COUNTERS",
                            
@@ -51,7 +45,7 @@ ui <- fluidPage(theme = dark_theme,
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
-                                              "Our team’s role in addressing this problem is to quantify the carbon storage potential of these lands, and help integrate that information into county planning for increased carbon storage into the future.",
+                                              "Our team’s role in addressing this problem is to quantify the carbon storage potential of these lands and help integrate that information into county planning for increased carbon storage into the future.",
                                               br(),
                                               br(),
                                               img(src = "farms1.jpg", height = 400, width = 700),
@@ -60,7 +54,7 @@ ui <- fluidPage(theme = dark_theme,
                                               br(),
                                               br(),
                                               h2("Project Objectives"),
-                                              "1. Calculate a Countywide carbon inventory by accounting for carbon (stock) storage and emissions associated with Santa Barbara County’s natural and working lands.",
+                                              "1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands.",
                                               br(),
                                               "2. Project land use change and resulting carbon stock and emissions to 2030, using a baseline trend from historical data.",
                                               br(),
@@ -92,6 +86,9 @@ ui <- fluidPage(theme = dark_theme,
                                                                                      "Rangeland" = 4)),
                                       ),
                                       mainPanel(h3("Land Cover, Carbon Stocks & Emissions in 2016"),
+                                                "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
+                                                br(), 
+                                                br(),
                                                 leafletOutput("ci_plot")
                                       )
                                     )),
@@ -122,7 +119,8 @@ ui <- fluidPage(theme = dark_theme,
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "practice",
-                                                                      label = h4("Select a Management Practice"),
+                                                                      label = h4("Select a Management Practice (up to 3)"), 
+                        ## or we need to figure out why it's breaking past 3
                                                                       choices = list("Reduced Till",
                                                                                       "Restoration",
                                                                                       "Mulching",
@@ -178,12 +176,17 @@ ui <- fluidPage(theme = dark_theme,
                            tabPanel("Carbon Counters",
                                     mainPanel(h2("Meet the team"),
                                               br(),
+                                              "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara.",
+                             
+                   #### Haven't figured out how to make pics go next to each other
+                                              
                                               h4("Alicia Fennell"),
                                               img(src = "alicia.jpeg", height = 300),
-                                              br(),
+                                              
                                               h4("Gavi Keyles"),
+                                      
                                               img(src = "gavi.jpg", height = 300),
-                                              br(),
+                                        
                                               h4("Madi Oliver"),
                                               img(src = "madi.jpg", height = 300),
                                               br(),
@@ -191,7 +194,15 @@ ui <- fluidPage(theme = dark_theme,
                                               img(src = "minnie.JPG", height = 300),
                                               br(),
                                               h4("Michael Wells"),
-                                              img(src = "michael.PNG", height = 300)
+                                              img(src = "michael.PNG", height = 300),
+                   
+                   #### Ugly but allows pics to move... 
+                   h5("Alicia Fennell, Gavi Keyles, Madeline Oliver, Minnie Ringland, & Michael Wells"),
+                   img(src = "alicia.jpeg", height = 300),
+                   img(src = "gavi.jpg", height = 300),
+                   img(src = "madi.jpg", height = 300),
+                   img(src = "minnie.JPG", height = 300),
+                   img(src = "michael.PNG", height = 300)
                                               )
                                     )
                            )
