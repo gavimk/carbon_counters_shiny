@@ -89,7 +89,8 @@ ggplot(data = mgmt) +
 barriers <- read_csv(here("data","barriers.csv"))
 
 test <- barriers %>% 
-  filter(barrier %in% "Cost/Funding")
+  filter(barrier == "Other") %>% 
+  print(comment)
 
 ```
 
