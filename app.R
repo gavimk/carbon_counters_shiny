@@ -156,7 +156,7 @@ ui <- fluidPage(theme = dark_theme,
                                                                choices = list("Education",
                                                                               "Time",
                                                                               "Cost/Funding",
-                                                                              "Regulatory/Permitting",
+                                                                              "Regulations/Permitting",
                                                                               "Other")
                                                                )
                                                    ),
@@ -312,9 +312,13 @@ server <- function(input, output) {
   
   barriers <- read_csv(here("data","barriers.csv"))
   
-  output$selected_barrier <- renderTable({
+  barriers_react <- reactive({
     barriers %>% 
       filter(barrier == input$select_barrier)
+  })
+  
+  output$selected_barrier <- renderTable({
+    barriers_react()
   })
   
   output$print_feedback <- renderPrint({
