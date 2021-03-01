@@ -1,3 +1,6 @@
+### Shiny App for Carbon Counters Group Project, last updated Feb 2021
+
+
 ### Attach libraries
 library(shiny)
 library(tidyverse)
@@ -12,7 +15,7 @@ library(janitor)
 library(wesanderson)
 
 
-########## Set themes
+### Set themes
 dark_theme <- bs_theme(
   bg = "#053d57",
   fg = "#FFFAF0",
@@ -78,10 +81,9 @@ ui <- fluidPage(theme = dark_theme,
                            # First Tab
                            tabPanel("Carbon Inventory",
                                     sidebarLayout(
-                                      sidebarPanel(h4("Landcover Category"),
-                                                   br(),
+                                      sidebarPanel(
                                                    checkboxGroupInput(inputId = "select_landcover",
-                                                                      label = "Select one or more:",
+                                                                      label = h4("Select one or more landcover category"),
                                                                       br(),
                                                                       #choices = unique(inventory$land_class)
                                                                       choices = list("Orchard" = 1,
@@ -97,16 +99,16 @@ ui <- fluidPage(theme = dark_theme,
                            # Second Tab
                            tabPanel("Project to 2030",
                                     sidebarLayout(
-                                      sidebarPanel(h4("Working Lands in 2030"),
+                                      sidebarPanel(
                                                    radioButtons("variable",
-                                                                label = "Select Variable",
+                                                                label = h4("Select a Variable"),
                                                                 choices = list("Acreage"= "Acres",
                                                                                "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
                                                                                "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
                                                    ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
                                                 br(),
-                                                "Using simple linear regressions based on three years of historical data (2012, 2016, and 2019), our team estimated the acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in soils and biomass, and nitrous oxide emissions are based on fertilizer application rates.",
+                                                "Our team used simple linear regressions based on three years of historical data (2012, 2016, and 2019), to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
                               ###this blurb could go below the graphs if we prefer 
                                                 br(),
                                                 br(),
@@ -120,18 +122,19 @@ ui <- fluidPage(theme = dark_theme,
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "practice",
-                                                                      label = h4("Choose a Management Practice:"),
+                                                                      label = h4("Select a Management Practice"),
                                                                       choices = list("Reduced Till",
                                                                                       "Restoration",
                                                                                       "Mulching",
                                                                                       "Cover Crops",
                                                                                       "Hedgerow Planting" = "Hedgerow",
                                                                                       "Compost",
-                                                                                      "Tree/Shrub Establishment")
+                                                                                      "Tree/Shrub Establishment"),
+                                                                      selected = "Reduced Till"
                                                    ),
                                                    hr(),
                                                    radioButtons(inputId = "level",
-                                                                label = h4("Select Implementation Level:"),
+                                                                label = h4("Select Implementation Level"),
                                                                 choices = list("High",
                                                                                "Low")),
                                                    #sliderInput("acres_slide",
@@ -141,7 +144,7 @@ ui <- fluidPage(theme = dark_theme,
                                                                # value = 50)
                                       ),
                                       mainPanel(h3("Management Practices - Carbon Stock Change Over Time"),
-                                                plotOutput("output$mgmt_plot") # broken! help!
+                                                plotOutput("mgmt_plot") 
                                       )
                                     )),
                            
@@ -157,13 +160,17 @@ ui <- fluidPage(theme = dark_theme,
                                                                               "Other")
                                                                )
                                                    ),
-                                      mainPanel(h3("See what other land managers have said, and add your own comments?"),
+                                      mainPanel(h3("See what other land managers have said"),
                                       br(),
                                       br(),
                                       "These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
                                       br(),
                                       br(),
                                       tableOutput("selected_barrier"), # issue with some options not being valid
+                                      br(),
+                                      textInput("barrier_feedback",
+                                                label = h4("Add your own comments")),
+                                      verbatimTextOutput("print_feedback")
                                       )
                                     )),
                            
@@ -211,7 +218,7 @@ server <- function(input, output) {
   })
   
   
-  #projection code
+  ## projection code
 
   project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
     mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
@@ -222,8 +229,6 @@ server <- function(input, output) {
     mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
     mutate(variable = replace(variable, variable == "noemit", "Nitrous Oxide Emissions (MTCO2e)")) %>%
     mutate(variable = replace(variable, variable == "total_stock", "Total Carbon Stock (MT Carbon)")) 
-  
-  #####
 
   proj_obs_react <- reactive({ 
     project_obs %>% 
@@ -261,7 +266,9 @@ server <- function(input, output) {
       scale_x_continuous(breaks = c(2012, 2016, 2019, 2030), labels = c("'12", "'16", "'19", "'30"))
   })
   
+  
   ## mgmt practices code
+  
   mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
     clean_names() %>% 
     select(-2) %>% 
@@ -302,6 +309,7 @@ server <- function(input, output) {
   
   
   ## barriers code
+  
   barriers <- read_csv(here("data","barriers.csv"))
   
   output$selected_barrier <- renderTable({
@@ -309,7 +317,11 @@ server <- function(input, output) {
       filter(barrier == input$select_barrier)
   })
   
+  output$print_feedback <- renderPrint({
+    input$barrier_feedback
+  })
   
 }
 
 shinyApp(ui = ui, server = server)
+
