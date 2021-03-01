@@ -54,6 +54,12 @@ ggplot(data = matrix) +
     geom_col(aes(x=year, y = N2O, fill = year))
 
 
+## Testing changing variable names to fix axis labels in projection plots 
+# alicia_test <- project_obs %>% 
+#   mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
+#   mutate(variable = replace(variable, variable == "noemit", "Nitrous Oxide Emissions (MTCO2e)")) %>%
+#   mutate(variable = replace(variable, variable == "total_stock", "Total Carbon Stock (MT Carbon)")) 
+
 ```
 
 

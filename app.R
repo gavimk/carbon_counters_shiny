@@ -8,6 +8,8 @@ library(tmap) # for interactive maps
 library(leaflet)
 library(tmaptools)
 library(mapview)
+library(janitor)
+library(wesanderson)
 
 
 ########## Set themes
@@ -38,9 +40,6 @@ white_back_theme <- bs_theme(
 ui <- fluidPage(theme = dark_theme,
                 
                navbarPage("CARBON COUNTERS",
-   ## I think it looks a little cleaner with a short title or no title - thoughts? 
-   ## Minnie - yes this looks better
-   ### Carbon Counters: Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands
                            
                            tabPanel("Home",
                                     titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
@@ -101,12 +100,18 @@ ui <- fluidPage(theme = dark_theme,
                                       sidebarPanel(h4("Working Lands in 2030"),
                                                    radioButtons("variable",
                                                                 label = "Select Variable",
-                                                                choices = list("Acreage"= "acres",
-                                                                               "Carbon Stock"= "total_stock",
-                                                                               "N2O Emissions"= "noemit")),
+                                                                choices = list("Acreage"= "Acres",
+                                                                               "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
+                                                                               "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
                                                    ),
-                                      mainPanel(h3("Our linear regression estimates this is what the County's working lands will look like in 2030"),
-                                                plotOutput("projection_plot")  
+                                      mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
+                                                br(),
+                                                "Using simple linear regressions based on three years of historical data (2012, 2016, and 2019), our team estimated the acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in soils and biomass, and nitrous oxide emissions are based on fertilizer application rates.",
+                              ###this blurb could go below the graphs if we prefer 
+                                                br(),
+                                                br(),
+                                                plotOutput("projection_plot"),
+                                                br()
                                       )
                                     )),
                            
@@ -208,8 +213,17 @@ server <- function(input, output) {
   
   #projection code
 
-  project_obs <- read_csv(here("data", "shiny_observed_30.csv"))
-  project_pred <- read_csv(here("data", "shiny_predict_30.csv"))
+  project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
+    mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
+    mutate(variable = replace(variable, variable == "noemit", "Nitrous Oxide Emissions (MTCO2e)")) %>%
+    mutate(variable = replace(variable, variable == "total_stock", "Total Carbon Stock (MT Carbon)")) 
+  
+  project_pred <- read_csv(here("data", "shiny_predict_30.csv")) %>% 
+    mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
+    mutate(variable = replace(variable, variable == "noemit", "Nitrous Oxide Emissions (MTCO2e)")) %>%
+    mutate(variable = replace(variable, variable == "total_stock", "Total Carbon Stock (MT Carbon)")) 
+  
+  #####
 
   proj_obs_react <- reactive({ 
     project_obs %>% 
@@ -222,16 +236,27 @@ server <- function(input, output) {
   output$projection_plot <- renderPlot({
     ggplot() +
       geom_line(data = proj_pred_react(), 
-                aes(x = year, y = value, group = land_class, color = land_class), 
-                size = .8, linetype = "dashed") +
+                aes(x = year, 
+                    y = value, 
+                    group = land_class, 
+                    color = land_class),
+                size = .8, 
+                linetype = "dashed") +
       geom_point(data = proj_obs_react(), 
-                 aes(x = year, y = value, group = land_class, color = land_class), 
+                 aes(x = year, 
+                     y = value, 
+                     group = land_class, 
+                     color = land_class), 
                  size = 3.6) +
       theme_minimal() +
       scale_color_manual(values = c("lightsteelblue", "goldenrod", "lightslategrey", "darkred", "sandybrown", "darkolivegreen3", "green4", "cornflowerblue", "purple4")) +
       labs(color = "Land Class",
            y = input$variable,
-           x = "") +
+           x = "Year",
+           title = "Estimated (2012-2019) and Projected (2030) Values by Land Class",
+           subtitle = input$variable) +
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.subtitle = element_text(hjust = 0.5)) +
       scale_y_continuous(labels = scales::comma) +
       scale_x_continuous(breaks = c(2012, 2016, 2019, 2030), labels = c("'12", "'16", "'19", "'30"))
   })
