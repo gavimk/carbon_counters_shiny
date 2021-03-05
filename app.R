@@ -85,7 +85,7 @@ ui <- fluidPage(theme = light_theme,
                                                                                      "Row Crop" = 3,
                                                                                      "Rangeland" = 4)),
                                       ),
-                                      mainPanel(h3("Land Cover, Carbon Stocks & Emissions in 2016"),
+                                      mainPanel(h3("Land Cover, Carbon Stocks, and Nitrous Oxide Emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
@@ -158,7 +158,7 @@ ui <- fluidPage(theme = light_theme,
                                                                               "Other")
                                                                )
                                                    ),
-                                      mainPanel(h3("See what other land managers have said"),
+                                      mainPanel(h3("Barriers to Implementation of Carbon-Smart Management Practices"),
                                       br(),
                                       br(),
                                       "These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
@@ -176,17 +176,17 @@ ui <- fluidPage(theme = light_theme,
                            tabPanel("Carbon Counters",
                                     mainPanel(h2("Meet the team"),
                                               br(),
-                                              "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara.",
+                                              "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
                              
                    #### Haven't figured out how to make pics go next to each other
                                               
                                               h4("Alicia Fennell"),
                                               img(src = "alicia.jpeg", height = 300),
-                                              
+                                              br(),
                                               h4("Gavi Keyles"),
-                                      
+                                              br(),
                                               img(src = "gavi.jpg", height = 300),
-                                        
+                                              br(),
                                               h4("Madi Oliver"),
                                               img(src = "madi.jpg", height = 300),
                                               br(),
@@ -196,13 +196,6 @@ ui <- fluidPage(theme = light_theme,
                                               h4("Michael Wells"),
                                               img(src = "michael.PNG", height = 300),
                    
-                   #### Ugly but allows pics to move... 
-                   h5("Alicia Fennell, Gavi Keyles, Madeline Oliver, Minnie Ringland, & Michael Wells"),
-                   img(src = "alicia.jpeg", height = 300),
-                   img(src = "gavi.jpg", height = 300),
-                   img(src = "madi.jpg", height = 300),
-                   img(src = "minnie.JPG", height = 300),
-                   img(src = "michael.PNG", height = 300)
                                               )
                                     )
                            )
@@ -269,12 +262,19 @@ server <- function(input, output) {
       labs(color = "Land Class",
            y = input$variable,
            x = "Year",
-           title = "Estimated (2012-2019) and Projected (2030) Values by Land Class",
+           title = "Estimated and Projected Values by Land Class",
            subtitle = input$variable) +
-      theme(plot.title = element_text(hjust = 0.5)) +
-      theme(plot.subtitle = element_text(hjust = 0.5)) +
       scale_y_continuous(labels = scales::comma) +
-      scale_x_continuous(breaks = c(2012, 2016, 2019, 2030), labels = c("'12", "'16", "'19", "'30"))
+      scale_x_continuous(breaks = c(2012, 2016, 2019, 2030), labels = c("'12", "'16", "'19", "'30")) +
+      theme(plot.title = element_text(hjust = 0.5, size = 20, margin=margin(0,0,10,0)),
+            plot.subtitle = element_text(hjust = 0.5, size = 18, margin=margin(0,0,10,0)),
+            axis.text.x = element_text(size = 16, angle = 0, hjust = .5, vjust = .5),
+            axis.text.y = element_text(size = 16, angle = 0, hjust = 1, vjust = 0),  
+            axis.title.x = element_text(size = 18, angle = 0, hjust = .5, vjust = 0, margin=margin(10,0,0,0)),
+            axis.title.y = element_text(size = 18, angle = 90, hjust = .5, vjust = .5, margin=margin(0,10,0,0)),
+            legend.text = element_text(size = 16, margin=margin(0,0,10,0)),
+            legend.title = element_text(size = 18))
+    
   })
   
   
