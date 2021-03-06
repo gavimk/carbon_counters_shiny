@@ -43,12 +43,12 @@ ui <- fluidPage(theme = light_theme,
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
-                                              "Our team’s role in addressing this problem is to quantify the carbon storage potential of these lands and help integrate that information into county planning for increased carbon storage into the future.",
+                                              "Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
                                               br(),
                                               br(),
                                               img(src = "farms1.jpg", height = 400, width = 700),
                                               br(),
-                                              "add citation for photo",
+                                              "Santa Maria Times",
                                               br(),
                                               br(),
                                               h2("Project Objectives"),
@@ -70,7 +70,7 @@ ui <- fluidPage(theme = light_theme,
                                     img(src = "CountyMap.gif", height = 500, width = 700)
                                    )),
                            
-                           # First Tab
+                           # Inventory Tab
                           tabPanel("Carbon Inventory", icon = icon("tree"),
                                     sidebarLayout(
                                       sidebarPanel(
@@ -91,7 +91,7 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Second Tab
+                           # Projections Tab
                       tabPanel("Projections", icon = icon("chart-line"),
                                     sidebarLayout(
                                       sidebarPanel(
@@ -111,7 +111,7 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Third Tab
+                           # Scenarios Tab
                         tabPanel("Management Scenarios", icon = icon("seedling"),
                                     sidebarLayout(
                                       sidebarPanel(
@@ -145,7 +145,7 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Fourth Tab
+                           # Barriers Tab
                         tabPanel("Barriers", icon = icon("comments"),
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
@@ -170,29 +170,48 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Fifth Tab
+                           # "About the Team" Tab
                         tabPanel("Carbon Counters", icon = icon("smile-beam"),
                                     mainPanel(h2("Meet the team"),
                                               br(),
                                               "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
+                                              br(),
+                                              br(),
+                                              ("You can find out more about our project at"),
+                                              (href="https://carboncounters.weebly.com/"),
                              
                    #### Haven't figured out how to make pics go next to each other
                                               
-                                              h4("Alicia Fennell"),
+                                              h4("Alicia Fennell, Data and Outreach Manager"),
                                               img(src = "alicia.jpeg", height = 300),
                                               br(),
-                                              h4("Gavi Keyles"),
+                                              (" Alicia is a Goleta local with a background in outdoor and environmental education. Interested in climate action planning, sustainable food systems, and community-based solutions."),
+                   br(),
+                   br(),
+                                              h4("Gavi Keyles, Co-Project Manager"),
                                               br(),
                                               img(src = "gavi.jpg", height = 300),
                                               br(),
-                                              h4("Madi Oliver"),
+                                              ("Gavi is a New Jersey native with a background in renewable energy and environmental stakeholder engagement. Interested in climate policy, environmental justice, and ecosystem-based solutions."),
+                   br(),
+                   br(),
+                   
+                                              h4("Madeline Oliver, Editor and Outreach Manager"),
                                               img(src = "madi.jpg", height = 300),
                                               br(),
-                                              h4("Minnie Ringland"),
+                   ("Madi attributes her love for close-knit coastal and rural communities to her upbringing in Carmel, Hawaii and the Napa Valley. She is passionate about and experienced in sustainable urban planning, design and policy."),
+                   br(),
+                   br(),
+                                              h4("Minnie Ringland, Co-Project Manager"),
                                               img(src = "minnie.JPG", height = 300),
                                               br(),
-                                              h4("Michael Wells"),
+                   ("Minnie is a Buffalo native with a background in biology and experience in industrial compliance. Interested in environmental law and policy, with an emphasis on inclusive implementation strategies."),
+                   br(),
+                   br(),
+                                              h4("Michael Wells, Data and Finance Manager"),
                                               img(src = "michael.PNG", height = 300),
+                   br(),
+                   ("Michael is from Dallas and has a background in tech and finance. He is interested in economics and policy of climate change.")
                    
                                               )
                                     )
