@@ -321,7 +321,8 @@ server <- function(input, output) {
   
   ## barriers code
   
-  barriers <- read_csv(here("data","barriers.csv"))
+  barriers <- read_csv(here("data","barriers.csv")) %>% 
+    rename("Comment" = comment)
   
   barriers_react <- reactive({
     barriers %>% 
@@ -329,7 +330,8 @@ server <- function(input, output) {
   })
   
   output$selected_barrier <- renderTable({
-    barriers_react()
+    barriers_react() %>% 
+      select(Comment)
   })
   
   output$print_feedback <- renderPrint({
