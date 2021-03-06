@@ -12,7 +12,7 @@ library(tmaptools)
 library(mapview)
 library(janitor)
 library(wesanderson)
-library(shinydashboard)
+# library(shinydashboard)
 
 ### Set themes
 dark_theme <- bs_theme(
@@ -324,7 +324,7 @@ server <- function(input, output) {
   
   barriers_react <- reactive({
     barriers %>% 
-      filter(Barrier == input$select_barrier)
+      filter(barrier == input$select_barrier)
   })
   
   output$selected_barrier <- renderTable({
