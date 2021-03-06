@@ -1,5 +1,4 @@
-### Shiny App for Carbon Counters Group Project, last updated Feb 2021
-
+### Shiny App for Carbon Counters Group Project, last updated March 2021
 
 ### Attach libraries
 library(shiny)
@@ -13,7 +12,7 @@ library(tmaptools)
 library(mapview)
 library(janitor)
 library(wesanderson)
-
+library(shinydashboard)
 
 ### Set themes
 dark_theme <- bs_theme(
@@ -34,11 +33,10 @@ light_theme <- bs_theme(
 ### User Interface
 
 ui <- fluidPage(theme = light_theme,
-                ### Thoughts on white background vs dark theme? I think the graphs look a little awkward against the dark background but I'm down for whatever. 
                 
-               navbarPage("CARBON COUNTERS",
-                           
-                           tabPanel("Home",
+              navbarPage("CARBON COUNTERS",
+                        
+                        tabPanel("Home", icon = icon("home"),
                                     titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
                                     mainPanel(align = "left",
                                               br(),
@@ -73,7 +71,7 @@ ui <- fluidPage(theme = light_theme,
                                    )),
                            
                            # First Tab
-                           tabPanel("Carbon Inventory",
+                          tabPanel("Carbon Inventory", icon = icon("tree"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "select_landcover",
@@ -94,7 +92,7 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Second Tab
-                           tabPanel("Project to 2030",
+                      tabPanel("Projections", icon = icon("chart-line"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    radioButtons("variable",
@@ -104,8 +102,7 @@ ui <- fluidPage(theme = light_theme,
                                                                                "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
                                                    ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
-                                                br(),
-                                                "Our team used simple linear regressions based on three years of historical data (2012, 2016, and 2019), to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
+                                                "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
                               ###this blurb could go below the graphs if we prefer 
                                                 br(),
                                                 br(),
@@ -115,7 +112,7 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Third Tab
-                           tabPanel("Carbon-Smart Management Practices",
+                        tabPanel("Management Scenarios", icon = icon("seedling"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "practice",
@@ -141,13 +138,15 @@ ui <- fluidPage(theme = light_theme,
                                                                # max = 100,
                                                                # value = 50)
                                       ),
-                                      mainPanel(h3("Management Practices - Carbon Stock Change Over Time"),
+                                      mainPanel(h3("Management Scenarios - Carbon Stock Change Over Time"),
+                                                "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
+                                                br(),
                                                 plotOutput("mgmt_plot") 
                                       )
                                     )),
                            
                            # Fourth Tab
-                           tabPanel("Barriers to Implementation",
+                        tabPanel("Barriers", icon = icon("comments"),
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
                                                                label = h4("Select a barrier"),
@@ -159,9 +158,8 @@ ui <- fluidPage(theme = light_theme,
                                                                )
                                                    ),
                                       mainPanel(h3("Barriers to Implementation of Carbon-Smart Management Practices"),
-                                      br(),
-                                      br(),
-                                      "These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
+
+                                      "We wanted to understand the greatest barriers for implementing carbon-smart management practices so that our recommendations for the County are helpful and relevant. These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
                                       br(),
                                       br(),
                                       tableOutput("selected_barrier"), # issue with some options not being valid
@@ -173,7 +171,7 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Fifth Tab
-                           tabPanel("Carbon Counters",
+                        tabPanel("Carbon Counters", icon = icon("smile-beam"),
                                     mainPanel(h2("Meet the team"),
                                               br(),
                                               "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
@@ -322,24 +320,16 @@ server <- function(input, output) {
   ## barriers code
   
   barriers <- read_csv(here("data","barriers.csv")) %>% 
-<<<<<<< HEAD
     rename("Stakeholder Comments" = comment)
-=======
-    rename("Comment" = comment)
->>>>>>> 0596cc83ab0c42882778436b96c8ffcbd60b2da7
   
   barriers_react <- reactive({
     barriers %>% 
-      filter(barrier == input$select_barrier)
+      filter(Barrier == input$select_barrier)
   })
   
   output$selected_barrier <- renderTable({
     barriers_react() %>% 
-<<<<<<< HEAD
       select(2)
-=======
-      select(Comment)
->>>>>>> 0596cc83ab0c42882778436b96c8ffcbd60b2da7
   })
   
   output$print_feedback <- renderPrint({
