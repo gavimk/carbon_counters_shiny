@@ -1,4 +1,4 @@
-### Shiny App for Carbon Counters Group Project, last updated Feb 2021
+### Shiny App for Carbon Counters Group Project, last updated March 2021
 
 
 ### Attach libraries
@@ -13,6 +13,7 @@ library(tmaptools)
 library(mapview)
 library(janitor)
 library(wesanderson)
+library(shinydashboard)
 
 
 ### Set themes
@@ -33,12 +34,47 @@ light_theme <- bs_theme(
 
 ### User Interface
 
-ui <- fluidPage(theme = light_theme,
-                ### Thoughts on white background vs dark theme? I think the graphs look a little awkward against the dark background but I'm down for whatever. 
+
+ui <- #fluidPage
+  dashboardPage(# theme = light_theme,
                 
-               navbarPage("CARBON COUNTERS",
+              # navbarPage
+              dashboardHeader("CARBON COUNTERS",
+                             # icon = icon("envelope"),
+                        
                            
-                           tabPanel("Home",
+                           #tabPanel
+                           dashboardSidebar(width = 250,
+                                            sidebarMenu(
+                                              menuItem("Home", 
+                                                       tabName = "home"),
+                                            
+                                            menuItem("Carbon Inventory",
+                                                     tabName = "carbon"),
+                                            
+                                            menuItem("Project to 2030",
+                                                     tabName = "project"),
+                                            
+                                            menuItem("Management Scenarios",
+                                                     tabName = "manage"),
+                                            
+                                            menuItem("Barriers",
+                                                     tabName = "barriers"),
+                                            
+                                            menuItem("Meet the Team",
+                                                     tabName = "meetus")
+                                            
+                                            )
+                                            ), ## end dashboard sidebar 
+                           
+                           dashboardBody(
+                             tabItems(
+                               tabItem(tabName = "home",
+                                      
+                             
+                           
+                           
+                      #    tabPanel ("Home",
                                     titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
                                     mainPanel(align = "left",
                                               br(),
@@ -73,7 +109,9 @@ ui <- fluidPage(theme = light_theme,
                                    )),
                            
                            # First Tab
-                           tabPanel("Carbon Inventory",
+                          # tabPanel
+                      tabItem(tabName = "carbon", 
+                              h1("Carbon Inventory"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "select_landcover",
@@ -94,7 +132,9 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Second Tab
-                           tabPanel("Project to 2030",
+                          # tabPanel
+                      tabItem(tabName = "project", 
+                              h1("Project to 2030"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    radioButtons("variable",
@@ -115,7 +155,9 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Third Tab
-                           tabPanel("Carbon-Smart Management Practices",
+                          # tabPanel
+                      tabItem(tabName = "manage", 
+                              h1("Carbon-Smart Management Practices"),
                                     sidebarLayout(
                                       sidebarPanel(
                                                    checkboxGroupInput(inputId = "practice",
@@ -147,7 +189,9 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Fourth Tab
-                           tabPanel("Barriers to Implementation",
+                        #   tabPanel
+                      tabItem(tabName = "barriers", 
+                              h1("Barriers to Implementation"),
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
                                                                label = h4("Select a barrier"),
@@ -173,7 +217,9 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            # Fifth Tab
-                           tabPanel("Carbon Counters",
+                          # tabPanel
+                      tabItem(tabName = "meetus", 
+                              h1("Carbon Counters"),
                                     mainPanel(h2("Meet the team"),
                                               br(),
                                               "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
@@ -199,7 +245,7 @@ ui <- fluidPage(theme = light_theme,
                                               )
                                     )
                            )
-)
+))
 
 
 ### Server Interface
