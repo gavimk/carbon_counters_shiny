@@ -205,7 +205,7 @@ ui <- fluidPage(theme = light_theme,
                                               br(),
                                               img(src = "gavi.jpg", height = 300),
                                               br(),
-                                              ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities stronger, healthier, more equitable, and more resilient."),
+                                              ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities healthier, more equitable, and more resilient."),
                                               br(),
                                               br(),
                                               
@@ -353,8 +353,8 @@ server <- function(input, output) {
   
   ## barriers code
   
-  barriers <- read_csv(here("data","barriers.csv"))
-  # %>%   rename("Stakeholder Comments" = comment)
+  barriers <- read_csv(here("data","barriers.csv")) %>%   
+    rename("Stakeholder Comments" = 3)
   
   barriers_react <- reactive({
     barriers %>% 
@@ -362,8 +362,8 @@ server <- function(input, output) {
   })
   
   output$selected_barrier <- renderTable({
-    barriers_react()
-    # %>% select(2)
+    barriers_react() %>% 
+      select(3)
   })
   
   to_be_done_at_submit <- eventReactive(input$submitbutton, {
