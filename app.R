@@ -13,6 +13,7 @@ library(mapview)
 library(janitor)
 library(wesanderson)
 library(googlesheets4)
+
 # library(shinydashboard)
 
 ### Set themes
@@ -38,13 +39,16 @@ ui <- fluidPage(theme = light_theme,
                 navbarPage("CARBON COUNTERS",
                            
                            tabPanel("Home", icon = icon("home"),
+
                                     titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
                                     mainPanel(align = "left",
                                               br(),
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
+
                                               "Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
+
                                               br(),
                                               br(),
                                               img(src = "farms1.jpg", height = 400, width = 700),
@@ -73,6 +77,7 @@ ui <- fluidPage(theme = light_theme,
                            
                            # Inventory Tab
                            tabPanel("Carbon Inventory", icon = icon("tree"),
+
                                     sidebarLayout(
                                       sidebarPanel(
                                         checkboxGroupInput(inputId = "select_landcover",
@@ -94,6 +99,7 @@ ui <- fluidPage(theme = light_theme,
                            
                            # Projections Tab
                            tabPanel("Projections", icon = icon("chart-line"),
+
                                     sidebarLayout(
                                       sidebarPanel(
                                         radioButtons("variable",
@@ -104,7 +110,9 @@ ui <- fluidPage(theme = light_theme,
                                       ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
                                                 "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
+
                                                 ###this blurb could go below the graphs if we prefer 
+
                                                 br(),
                                                 br(),
                                                 plotOutput("projection_plot"),
@@ -148,6 +156,7 @@ ui <- fluidPage(theme = light_theme,
                            
                            # Barriers Tab
                            tabPanel("Barriers", icon = icon("comments"),
+
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
                                                                label = h4("Select a barrier"),
@@ -196,7 +205,7 @@ ui <- fluidPage(theme = light_theme,
                                               br(),
                                               img(src = "gavi.jpg", height = 300),
                                               br(),
-                                              ("Gavi is a New Jersey native with a background in renewable energy and environmental stakeholder engagement. Interested in climate policy, environmental justice, and ecosystem-based solutions."),
+                                              ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities stronger, healthier, more equitable, and more resilient."),
                                               br(),
                                               br(),
                                               
@@ -209,9 +218,11 @@ ui <- fluidPage(theme = light_theme,
                                               h4("Minnie Ringland, Co-Project Manager"),
                                               img(src = "minnie.JPG", height = 300),
                                               br(),
+
                                               ("Minnie is a Buffalo native with a background in biology and experience in industrial compliance. Interested in environmental law and policy, with an emphasis on inclusive implementation strategies."),
                                               br(),
                                               br(),
+                                              
                                               h4("Michael Wells, Data and Finance Manager"),
                                               img(src = "michael.PNG", height = 300),
                                               br(),

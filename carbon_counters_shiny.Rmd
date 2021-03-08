@@ -171,3 +171,25 @@ ggplot() +
 
 ```
 
+```{r}
+## Alicia trying random things 
+
+# ![](here("www", "alicia.jpeg") ![](here("www", "gavi.jpg")
+                                   
+library(cowplot)
+library(ggplot2)
+
+p1 <- ggdraw() + draw_image(here("www", "alicia.jpeg"), scale = 0.9)
+p2 <- ggdraw() + draw_image(here("www", "gavi.jpg"), scale = 0.9)
+
+plot_grid(p1, p2)
+
+## barriers and comments to uppercase
+
+  barriers <- read_csv(here("data","barriers.csv")) %>% 
+    rename("Barrier" = barrier) %>% 
+    rename("Comment" = comment)
+
+
+```
+
