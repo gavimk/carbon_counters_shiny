@@ -80,6 +80,9 @@ ui <- fluidPage(theme = light_theme,
 
                                     sidebarLayout(
                                       sidebarPanel(
+
+                                        #selectInput
+
                                         checkboxGroupInput(inputId = "select_landcover",
                                                            label = h4("Select one or more landcover category"),
                                                            br(),
@@ -87,13 +90,20 @@ ui <- fluidPage(theme = light_theme,
                                                            choices = list("Orchard" = 1,
                                                                           "Vineyard" = 2,
                                                                           "Row Crop" = 3,
-                                                                          "Rangeland" = 4)),
+                                                                          "Rangeland" = 4
+                                                                          # "carbon" = stock_rast,
+                                                                          # "n2o" = n2o_rast,
+                                                                          # "land" = landclass_rast,
+                                                                          # "soil" = soil_rast,
+                                                                          # "abv" = abv_rast
+                                                                          )),
                                       ),
                                       mainPanel(h3("Land Cover, Carbon Stocks, and Nitrous Oxide Emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
-                                                leafletOutput("ci_plot")
+                                             tabPanel(leafletOutput("ci_plot"))
+                                           
                                       )
                                     )),
                            
@@ -237,21 +247,54 @@ ui <- fluidPage(theme = light_theme,
 ### Server Interface
 server <- function(input, output) {
   
-  ## inventory code
+  # inventory code
   ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
-  
-  ca_subset <- ca_counties %>% 
-    select(NAME, ALAND) %>% 
+
+  ca_subset <- ca_counties %>%
+    select(NAME, ALAND) %>%
     rename(county_name = NAME, land_area = ALAND)
-  
+
   mycols <- c("blue", "red", "green", "purple") # colors not working
-  
+
   output$ci_plot <- renderLeaflet({
     map <- tm_shape(ca_subset) +
       tm_fill(col=mycols[input$select_landcover])
-    
+
     tmap_leaflet(map)
+    
   })
+  
+  ## Trying new maps 
+  #   
+  # stock_rast <- here("spatial", "carbonstock_raster.tif")%>%
+  #   raster()
+  # soil_rast <- here("spatial", "soil_raster.tif")%>%
+  #   raster()
+  # abv_rast <- here("spatial", "aboveground_raster.tif")%>%
+  #     raster()
+  # n2o_rast <- here("spatial", "n2o_raster.tif")%>%
+  #   raster()
+  # landclass_rast <- here("spatial", "landclass_raster.tif")%>%
+  #   raster()
+  # 
+  # tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
+  # 
+  # output$ci_plot <- renderLeaflet({
+  # 
+  #   if(input$select_landcover == "carbon"){
+  #     ci_plot <-
+  #       tm_shape(stock_rast) +
+  #       tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
+  #   }
+  #   
+  #   else({
+  #     tm_shape(soil_rast) 
+  #   })
+  #   
+  #   tmap_mode("view")
+  #   tmap_leaflet(ci_plot)
+  ##   
+  # }) 
   
   
   ## projection code
