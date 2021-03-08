@@ -12,6 +12,8 @@ library(tmaptools)
 library(mapview)
 library(janitor)
 library(wesanderson)
+library(googlesheets4)
+
 # library(shinydashboard)
 
 ### Set themes
@@ -34,21 +36,24 @@ light_theme <- bs_theme(
 
 ui <- fluidPage(theme = light_theme,
                 
-              navbarPage("CARBON COUNTERS",
-                        
-                        tabPanel("Home", icon = icon("home"),
+                navbarPage("CARBON COUNTERS",
+                           
+                           tabPanel("Home", icon = icon("home"),
+
                                     titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
                                     mainPanel(align = "left",
                                               br(),
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
-                                              "Our team’s role in addressing this problem is to quantify the carbon storage potential of these lands and help integrate that information into county planning for increased carbon storage into the future.",
+
+                                              "Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
+
                                               br(),
                                               br(),
                                               img(src = "farms1.jpg", height = 400, width = 700),
                                               br(),
-                                              "add citation for photo",
+                                              "Santa Maria Times",
                                               br(),
                                               br(),
                                               h2("Project Objectives"),
@@ -64,24 +69,25 @@ ui <- fluidPage(theme = light_theme,
                                               br(),
                                               br(),
                                               h2("Climate Goals: Show Timeline Maybe"),
-                                    "State targets of reaching 40% below 1990 emissions levels by 2030, and reaching carbon neutrality by 2045. Santa Barbara County has set an equivalent target for 2030, to reduce emissions 50% below 2007 levels.",
-                                    br(),
-                                    br(),
-                                    img(src = "CountyMap.gif", height = 500, width = 700)
-                                   )),
+                                              "State targets of reaching 40% below 1990 emissions levels by 2030, and reaching carbon neutrality by 2045. Santa Barbara County has set an equivalent target for 2030, to reduce emissions 50% below 2007 levels.",
+                                              br(),
+                                              br(),
+                                              img(src = "CountyMap.gif", height = 500, width = 700)
+                                    )),
                            
-                           # First Tab
-                          tabPanel("Carbon Inventory", icon = icon("tree"),
+                           # Inventory Tab
+                           tabPanel("Carbon Inventory", icon = icon("tree"),
+
                                     sidebarLayout(
                                       sidebarPanel(
-                                                   checkboxGroupInput(inputId = "select_landcover",
-                                                                      label = h4("Select one or more landcover category"),
-                                                                      br(),
-                                                                      #choices = unique(inventory$land_class)
-                                                                      choices = list("Orchard" = 1,
-                                                                                     "Vineyard" = 2,
-                                                                                     "Row Crop" = 3,
-                                                                                     "Rangeland" = 4)),
+                                        checkboxGroupInput(inputId = "select_landcover",
+                                                           label = h4("Select one or more landcover category"),
+                                                           br(),
+                                                           #choices = unique(inventory$land_class)
+                                                           choices = list("Orchard" = 1,
+                                                                          "Vineyard" = 2,
+                                                                          "Row Crop" = 3,
+                                                                          "Rangeland" = 4)),
                                       ),
                                       mainPanel(h3("Land Cover, Carbon Stocks, and Nitrous Oxide Emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
@@ -92,19 +98,22 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Second Tab
-                      tabPanel("Projections", icon = icon("chart-line"),
+                           # Projections Tab
+                           tabPanel("Projections", icon = icon("chart-line"),
+
                                     sidebarLayout(
                                       sidebarPanel(
-                                                   radioButtons("variable",
-                                                                label = h4("Select a Variable"),
-                                                                choices = list("Acreage"= "Acres",
-                                                                               "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
-                                                                               "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
-                                                   ),
+                                        radioButtons("variable",
+                                                     label = h4("Select a Variable"),
+                                                     choices = list("Acreage"= "Acres",
+                                                                    "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
+                                                                    "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
+                                      ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
                                                 "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
-                              ###this blurb could go below the graphs if we prefer 
+
+                                                ###this blurb could go below the graphs if we prefer 
+
                                                 br(),
                                                 br(),
                                                 plotOutput("projection_plot"),
@@ -112,32 +121,32 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Third Tab
-                        tabPanel("Management Scenarios", icon = icon("seedling"),
+                           # Scenarios Tab
+                           tabPanel("Management Scenarios", icon = icon("seedling"),
                                     sidebarLayout(
                                       sidebarPanel(
-                                                   checkboxGroupInput(inputId = "practice",
-                                                                      label = h4("Select a Management Practice (up to 3)"), 
-                        ## or we need to figure out why it's breaking past 3
-                                                                      choices = list("Reduced Till",
-                                                                                      "Restoration",
-                                                                                      "Mulching",
-                                                                                      "Cover Crops",
-                                                                                      "Hedgerow Planting" = "Hedgerow",
-                                                                                      "Compost",
-                                                                                      "Tree/Shrub Establishment"),
-                                                                      selected = "Reduced Till"
-                                                   ),
-                                                   hr(),
-                                                   radioButtons(inputId = "level",
-                                                                label = h4("Select Implementation Level"),
-                                                                choices = list("High",
-                                                                               "Low")),
-                                                   #sliderInput("acres_slide",
-                                                               # label = h4("Percent of 2030 Acreage"),
-                                                               # min = 0, 
-                                                               # max = 100,
-                                                               # value = 50)
+                                        checkboxGroupInput(inputId = "practice",
+                                                           label = h4("Select a Management Practice (up to 3)"), 
+                                                           ## or we need to figure out why it's breaking past 3
+                                                           choices = list("Reduced Till",
+                                                                          "Restoration",
+                                                                          "Mulching",
+                                                                          "Cover Crops",
+                                                                          "Hedgerow Planting" = "Hedgerow",
+                                                                          "Compost",
+                                                                          "Tree/Shrub Establishment"),
+                                                           selected = "Reduced Till"
+                                        ),
+                                        hr(),
+                                        radioButtons(inputId = "level",
+                                                     label = h4("Select Implementation Level"),
+                                                     choices = list("High",
+                                                                    "Low")),
+                                        #sliderInput("acres_slide",
+                                        # label = h4("Percent of 2030 Acreage"),
+                                        # min = 0, 
+                                        # max = 100,
+                                        # value = 50)
                                       ),
                                       mainPanel(h3("Management Scenarios - Carbon Stock Change Over Time"),
                                                 "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
@@ -146,8 +155,9 @@ ui <- fluidPage(theme = light_theme,
                                       )
                                     )),
                            
-                           # Fourth Tab
-                        tabPanel("Barriers", icon = icon("comments"),
+                           # Barriers Tab
+                           tabPanel("Barriers", icon = icon("comments"),
+
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
                                                                label = h4("Select a barrier"),
@@ -156,48 +166,72 @@ ui <- fluidPage(theme = light_theme,
                                                                               "Cost/Funding",
                                                                               "Regulations/Permitting",
                                                                               "Other")
-                                                               )
-                                                   ),
+                                      )
+                                      ),
                                       mainPanel(h3("Barriers to Implementation of Carbon-Smart Management Practices"),
-
-                                      "We wanted to understand the greatest barriers for implementing carbon-smart management practices so that our recommendations for the County are helpful and relevant. These comments were provided anonymously through a survey distributed in September 2020 to a network of agricultural stakeholders in the County.",
-                                      br(),
-                                      br(),
-                                      tableOutput("selected_barrier"), # issue with some options not being valid
-                                      br(),
-                                      textInput("barrier_feedback",
-                                                label = h4("Add your own comments")),
-                                      verbatimTextOutput("print_feedback")
+                                                
+                                                "We wanted to understand the greatest barriers to implementing carbon-smart management practices so that our recommendations for the County are helpful and relevant. These comments were collected through an anonymous survey distributed in September 2020 to a network of agricultural stakeholders in the County, individual interviews with identified local experts, and group discussions with a regenerative agriculture advisory committee convened by the County.",
+                                                br(),
+                                                br(),
+                                                tableOutput("selected_barrier"),
+                                                br(),
+                                                textInput("barrier_feedback",
+                                                          label = h4("Add your own comments")),
+                                                verbatimTextOutput("print_feedback"),
+                                                actionButton("submitbutton", label = "Submit"),
+                                                hr(),
+                                                uiOutput("submitthanks")
                                       )
                                     )),
                            
-                           # Fifth Tab
-                        tabPanel("Carbon Counters", icon = icon("smile-beam"),
+                           # "About the Team" Tab
+                           tabPanel("Carbon Counters", icon = icon("smile-beam"),
                                     mainPanel(h2("Meet the team"),
                                               br(),
                                               "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
-                             
-                   #### Haven't figured out how to make pics go next to each other
+                                              br(),
+                                              br(),
+                                              ("You can find out more about our project at"),
+                                              (href="https://carboncounters.weebly.com/"),
                                               
-                                              h4("Alicia Fennell"),
+                                              #### Haven't figured out how to make pics go next to each other
+                                              
+                                              h4("Alicia Fennell, Data and Outreach Manager"),
                                               img(src = "alicia.jpeg", height = 300),
                                               br(),
-                                              h4("Gavi Keyles"),
+                                              (" Alicia is a Goleta local with a background in outdoor and environmental education. Interested in climate action planning, sustainable food systems, and community-based solutions."),
+                                              br(),
+                                              br(),
+                                              h4("Gavi Keyles, Co-Project Manager"),
                                               br(),
                                               img(src = "gavi.jpg", height = 300),
                                               br(),
-                                              h4("Madi Oliver"),
+                                              ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities stronger, healthier, more equitable, and more resilient."),
+                                              br(),
+                                              br(),
+                                              
+                                              h4("Madeline Oliver, Editor and Outreach Manager"),
                                               img(src = "madi.jpg", height = 300),
                                               br(),
-                                              h4("Minnie Ringland"),
+                                              ("Madi attributes her love for close-knit coastal and rural communities to her upbringing in Carmel, Hawaii and the Napa Valley. She is passionate about and experienced in sustainable urban planning, design and policy."),
+                                              br(),
+                                              br(),
+                                              h4("Minnie Ringland, Co-Project Manager"),
                                               img(src = "minnie.JPG", height = 300),
                                               br(),
-                                              h4("Michael Wells"),
+
+                                              ("Minnie is a Buffalo native with a background in biology and experience in industrial compliance. Interested in environmental law and policy, with an emphasis on inclusive implementation strategies."),
+                                              br(),
+                                              br(),
+                                              
+                                              h4("Michael Wells, Data and Finance Manager"),
                                               img(src = "michael.PNG", height = 300),
-                   
-                                              )
+                                              br(),
+                                              ("Michael is from Dallas and has a background in tech and finance. He is interested in economics and policy of climate change.")
+                                              
                                     )
                            )
+                )
 )
 
 
@@ -228,7 +262,7 @@ server <- function(input, output) {
   
   
   ## projection code
-
+  
   project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
     mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
     mutate(variable = replace(variable, variable == "noemit", "Nitrous Oxide Emissions (MTCO2e)")) %>%
@@ -238,15 +272,15 @@ server <- function(input, output) {
     mutate(variable = replace(variable, variable == "acres", "Acres")) %>%
     mutate(variable = replace(variable, variable == "noemit", "Nitrous Oxide Emissions (MTCO2e)")) %>%
     mutate(variable = replace(variable, variable == "total_stock", "Total Carbon Stock (MT Carbon)")) 
-
+  
   proj_obs_react <- reactive({ 
     project_obs %>% 
       filter(variable == input$variable)})
-
+  
   proj_pred_react <- reactive({
     project_pred %>% 
       filter(variable == input$variable)})
-
+  
   output$projection_plot <- renderPlot({
     ggplot() +
       geom_line(data = proj_pred_react(), 
@@ -303,7 +337,7 @@ server <- function(input, output) {
     mgmt_practice %>% 
       filter(practice == input$practice) %>% 
       filter(level == input$level)
-    })
+  })
   
   baseline <- mgmt_xl %>% 
     slice(1:15) %>% 
@@ -313,21 +347,21 @@ server <- function(input, output) {
   
   output$mgmt_plot <- renderPlot({
     ggplot() +
-    geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
-    geom_smooth(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
-    theme_minimal() + 
-    scale_color_manual(values = wes_colors) +
-    labs(x = "Year",
-         y = "Carbon Stock (million MT C)",
-         color = "Management Practice",
-         linetype = "Implementation Level") 
-    })
+      geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
+      geom_smooth(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
+      theme_minimal() + 
+      scale_color_manual(values = wes_colors) +
+      labs(x = "Year",
+           y = "Carbon Stock (million MT C)",
+           color = "Management Practice",
+           linetype = "Implementation Level") 
+  })
   
   
   ## barriers code
   
-  barriers <- read_csv(here("data","barriers.csv")) %>% 
-    rename("Stakeholder Comments" = comment)
+  barriers <- read_csv(here("data","barriers.csv"))
+  # %>%   rename("Stakeholder Comments" = comment)
   
   barriers_react <- reactive({
     barriers %>% 
@@ -335,14 +369,30 @@ server <- function(input, output) {
   })
   
   output$selected_barrier <- renderTable({
-    barriers_react() %>% 
-      select(2)
+    barriers_react()
+    # %>% select(2)
   })
   
+  to_be_done_at_submit <- eventReactive(input$submitbutton, {
+    #Collect data
+    dtData <- data.frame(Sys.Date(),input$barrier_feedback)
+    
+    #Put data on drive
+    gs4_auth()
+    sheet_append(ss = "https://docs.google.com/spreadsheets/d/1fVP5npbMgBwUumZBi67hiGN6CAAOLrn-2QaTWm1VQDw/edit?usp=sharing", 
+                 data = dtData)
+    
+    #Say thankyou
+    h5("Thanks for your feedback!")
+  })
+  
+  output$submitthanks <- renderUI({
+    to_be_done_at_submit()
+  })
+ 
   output$print_feedback <- renderPrint({
     input$barrier_feedback
   })
-  
 }
 
 shinyApp(ui = ui, server = server)

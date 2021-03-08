@@ -14,6 +14,8 @@ library(sf) # for spatial data
 library(tmap) # for interactive maps
 library(janitor)
 library(wesanderson)
+library(raster)
+
 ```
 
 ```{r}
@@ -92,6 +94,23 @@ test <- barriers %>%
   filter(barrier == "Other") %>% 
   print(comment)
 
+library(googlesheets4)
+
+#get your token to access google drive
+#shiny_token <- gs_auth() 
+#saveRDS(shiny_token, "shiny_app_token.rds")
+
+gs4_auth()
+ss <- "https://docs.google.com/spreadsheets/d/1fVP5npbMgBwUumZBi67hiGN6CAAOLrn-2QaTWm1VQDw/edit?usp=sharing"
+dat <- read_sheet(ss)
+Sys.Date()
+newdata <- data.frame(Sys.Date(),("howdy"))
+ss %>% 
+  sheet_append(newdata)
+
+dat2 <- read_sheet(ss) %>% 
+  mutate("Date"=as.Date.(1614988800))
+
 ```
 
 
@@ -168,10 +187,66 @@ plot_grid(p1, p2)
 
 ## barriers and comments to uppercase
 
-  barriers <- read_csv(here("data","barriers.csv")) %>% 
-    rename("Barrier" = barrier) %>% 
-    rename("Comment" = comment)
+```
 
+```{r}
+## Spatial
+
+stock_rast <- here("spatial", "carbonstock_raster.tif")%>% 
+  raster()
+soil_rast <- here("spatial", "soil_raster.tif")%>% 
+  raster()
+abv_rast <- here("spatial", "aboveground_raster.tif")%>% 
+  raster()
+n2o_rast <- here("spatial", "n2o_raster.tif")%>% 
+  raster()
+landclass_rast <- here("spatial", "landclass_raster.tif")%>% 
+  raster()
+
+tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
+
+
+# point_coords <- read_csv(here("spatial", "point_coords.csv"))
+# 
+# all_coord_vals <- merge(point_coords, values, by = "pointid") %>% 
+#   dplyr::select(!c(2,3)) %>% 
+#   mutate(total_stock = stock_soilc_mtco2e_pix + stock_abvgc_mtco2e_pixel)
+# 
+# all_coord_clean <- all_coord_vals %>% 
+#   st_as_sf(coords = c("lon", "lat")) %>% 
+#   st_set_crs(4326) %>% 
+#   mutate(reclass_fact = as.factor(reclass_cat)) %>% 
+#   mutate(reclass_num = as.numeric(reclass_fact)) %>% 
+#   st_transform("+proj=lcc +lat_0=33.5 +lon_0=-118 +lat_1=35.4666666666667 +lat_2=34.0333333333333 +x_0=2000000.0001016 +y_0=500000.0001016 +datum=NAD83 +units=us-ft +no_defs")
+
+
+tmap_mode("view")
+
+tm_shape(stock_rast) +
+  tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
+
+# colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+# 
+# landclass_rast_fact <- ratify(landclass_rast)
+# rat <- levels(landclass_rast_fact)[[1]]
+# rat$names <- unique(levels(all_coord_clean$reclass_fact))
+# levels(landclass_rast_fact) <- rat
+# 
+# tm_shape(landclass_rast_fact) +
+#   tm_raster(n = 14, pal = colors, alpha = .6) +
+#   tm_basemap(leaflet::providers$CartoDB.Positron)
+
+plot(tif_stack)
+
+stock_df <- rasterToPoints(stock_rast)%>%
+  as.data.frame()
+
+ggplot() +
+  geom_raster(data = stock_df,
+              aes(x = x,
+              y = y,
+              fill = carbonstock_raster)) +
+  theme_minimal()
 
 ```
 
