@@ -87,7 +87,8 @@ ui <- fluidPage(theme = light_theme,
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
-                                                leafletOutput("ci_plot")
+                                             tabPanel(leafletOutput("ci_plot"))
+                                           
                                       )
                                     )),
                            
@@ -203,21 +204,27 @@ ui <- fluidPage(theme = light_theme,
 ### Server Interface
 server <- function(input, output) {
   
-  ## inventory code
+  # inventory code
   ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
-  
-  ca_subset <- ca_counties %>% 
-    select(NAME, ALAND) %>% 
+
+  ca_subset <- ca_counties %>%
+    select(NAME, ALAND) %>%
     rename(county_name = NAME, land_area = ALAND)
-  
+
   mycols <- c("blue", "red", "green", "purple") # colors not working
-  
+
   output$ci_plot <- renderLeaflet({
     map <- tm_shape(ca_subset) +
       tm_fill(col=mycols[input$select_landcover])
-    
+
     tmap_leaflet(map)
+    
   })
+  
+
+  ## read in rasters
+  
+ # output$ci_plot
   
   
   ## projection code
