@@ -80,7 +80,9 @@ ui <- fluidPage(theme = light_theme,
 
                                     sidebarLayout(
                                       sidebarPanel(
+
                                         #selectInput
+
                                         checkboxGroupInput(inputId = "select_landcover",
                                                            label = h4("Select one or more landcover category"),
                                                            br(),
