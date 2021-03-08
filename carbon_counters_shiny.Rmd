@@ -204,24 +204,7 @@ n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
 landclass_rast <- here("data", "rasters", "landclass_raster.tif") %>% 
   raster(RAT = TRUE)
 
-
-
 tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
-
-
-# point_coords <- read_csv(here("spatial", "point_coords.csv"))
-# 
-# all_coord_vals <- merge(point_coords, values, by = "pointid") %>% 
-#   dplyr::select(!c(2,3)) %>% 
-#   mutate(total_stock = stock_soilc_mtco2e_pix + stock_abvgc_mtco2e_pixel)
-# 
-# all_coord_clean <- all_coord_vals %>% 
-#   st_as_sf(coords = c("lon", "lat")) %>% 
-#   st_set_crs(4326) %>% 
-#   mutate(reclass_fact = as.factor(reclass_cat)) %>% 
-#   mutate(reclass_num = as.numeric(reclass_fact)) %>% 
-#   st_transform("+proj=lcc +lat_0=33.5 +lon_0=-118 +lat_1=35.4666666666667 +lat_2=34.0333333333333 +x_0=2000000.0001016 +y_0=500000.0001016 +datum=NAD83 +units=us-ft +no_defs")
-
 
 tmap_mode("view")
 
@@ -245,12 +228,17 @@ plot(tif_stack)
 stock_df <- rasterToPoints(stock_rast)%>%
   as.data.frame()
 
+maps_df <- rasterToPoints(tif_stack) %>% 
+  as.data.frame()
+
+##render plot 
 ggplot() +
-  geom_raster(data = stock_df,
+  geom_raster(maps_df,
               aes(x = x,
               y = y,
-              fill = carbonstock_raster)) +
+              fill = input$select_map)) +
   theme_minimal()
+
 
 ```
 
