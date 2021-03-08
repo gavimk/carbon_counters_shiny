@@ -83,19 +83,14 @@ ui <- fluidPage(theme = light_theme,
 
                                         #selectInput
 
-                                        checkboxGroupInput(inputId = "select_landcover",
-                                                           label = h4("Select one or more landcover category"),
+                                        radioButtons(inputId = "select_map",
+                                                           label = h4("Choose a dataset below to see our results"),
                                                            br(),
-                                                           #choices = unique(inventory$land_class)
-                                                           choices = list("Orchard" = 1,
-                                                                          "Vineyard" = 2,
-                                                                          "Row Crop" = 3,
-                                                                          "Rangeland" = 4
-                                                                          # "carbon" = stock_rast,
-                                                                          # "n2o" = n2o_rast,
-                                                                          # "land" = landclass_rast,
-                                                                          # "soil" = soil_rast,
-                                                                          # "abv" = abv_rast
+                                                           choices = list("carbon" = stock_rast,
+                                                                          "n2o" = n2o_rast,
+                                                                          "land" = landclass_rast,
+                                                                          "soil" = soil_rast,
+                                                                          "abv" = abv_rast
                                                                           )),
                                       ),
                                       mainPanel(h3("Land Cover, Carbon Stocks, and Nitrous Oxide Emissions in 2016"),
@@ -215,7 +210,7 @@ ui <- fluidPage(theme = light_theme,
                                               br(),
                                               img(src = "gavi.jpg", height = 300),
                                               br(),
-                                              ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities stronger, healthier, more equitable, and more resilient."),
+                                              ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities healthier, more equitable, and more resilient."),
                                               br(),
                                               br(),
                                               
@@ -247,35 +242,37 @@ ui <- fluidPage(theme = light_theme,
 ### Server Interface
 server <- function(input, output) {
   
-  # inventory code
-  ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
-
-  ca_subset <- ca_counties %>%
-    select(NAME, ALAND) %>%
-    rename(county_name = NAME, land_area = ALAND)
-
-  mycols <- c("blue", "red", "green", "purple") # colors not working
-
-  output$ci_plot <- renderLeaflet({
-    map <- tm_shape(ca_subset) +
-      tm_fill(col=mycols[input$select_landcover])
-
-    tmap_leaflet(map)
-    
-  })
+  # # inventory code
+  # ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
+  # 
+  # ca_subset <- ca_counties %>%
+  #   select(NAME, ALAND) %>%
+  #   rename(county_name = NAME, land_area = ALAND)
+  # 
+  # mycols <- c("blue", "red", "green", "purple") # colors not working
+  # 
+  # output$ci_plot <- renderLeaflet({
+  #   map <- tm_shape(ca_subset) +
+  #     tm_fill(col=mycols[input$select_landcover])
+  # 
+  #   tmap_leaflet(map)
+  #   
+  # })
   
   ## Trying new maps 
   #   
-  # stock_rast <- here("spatial", "carbonstock_raster.tif")%>%
-  #   raster()
-  # soil_rast <- here("spatial", "soil_raster.tif")%>%
-  #   raster()
-  # abv_rast <- here("spatial", "aboveground_raster.tif")%>%
-  #     raster()
-  # n2o_rast <- here("spatial", "n2o_raster.tif")%>%
-  #   raster()
-  # landclass_rast <- here("spatial", "landclass_raster.tif")%>%
-  #   raster()
+  stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>%
+    raster()
+  soil_rast <- here("data", "rasters", "soil_raster.tif")%>%
+    raster()
+  abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>%
+      raster()
+  n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
+    raster()
+  landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
+    raster()
+  
+  plot(landclass_rast)
   # 
   # tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
   # 
@@ -296,6 +293,12 @@ server <- function(input, output) {
   ##   
   # }) 
   
+  tmap_mode("view")
+  output$ci_plot <- renderLeaflet({
+  
+  tm_shape(input$select_map) +
+    tm_raster()
+  })
   
   ## projection code
   
@@ -357,7 +360,7 @@ server <- function(input, output) {
   
   mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
     clean_names() %>% 
-    select(-2) %>% 
+    dplyr::select(-2) %>% 
     rename_at(.vars = vars(starts_with("x")),
               .funs = funs(sub("x", "", .))) %>% 
     pivot_longer(cols = 2:16, 
@@ -377,7 +380,7 @@ server <- function(input, output) {
   
   baseline <- mgmt_xl %>% 
     slice(1:15) %>% 
-    select(!level)
+    dplyr::select(!level)
   
   wes_colors <- wes_palette("Darjeeling1", 7, type = "continuous")
   
@@ -396,8 +399,8 @@ server <- function(input, output) {
   
   ## barriers code
   
-  barriers <- read_csv(here("data","barriers.csv"))
-  # %>%   rename("Stakeholder Comments" = comment)
+  barriers <- read_csv(here("data","barriers.csv")) %>%   
+    rename("Stakeholder Comments" = 3)
   
   barriers_react <- reactive({
     barriers %>% 
@@ -405,8 +408,8 @@ server <- function(input, output) {
   })
   
   output$selected_barrier <- renderTable({
-    barriers_react()
-    # %>% select(2)
+    barriers_react() %>% 
+      dplyr::select(3)
   })
   
   to_be_done_at_submit <- eventReactive(input$submitbutton, {
