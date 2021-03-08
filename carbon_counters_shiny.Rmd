@@ -193,16 +193,18 @@ plot_grid(p1, p2)
 ```{r}
 ## Spatial
 
-stock_rast <- here("spatial", "carbonstock_raster.tif")%>% 
+stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>% 
   raster()
-soil_rast <- here("spatial", "soil_raster.tif")%>% 
+soil_rast <- here("data", "rasters", "soil_raster.tif")%>% 
   raster()
-abv_rast <- here("spatial", "aboveground_raster.tif")%>% 
+abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>% 
   raster()
-n2o_rast <- here("spatial", "n2o_raster.tif")%>% 
+n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>% 
   raster()
-landclass_rast <- here("spatial", "landclass_raster.tif")%>% 
-  raster()
+landclass_rast <- here("data", "rasters", "landclass_raster.tif") %>% 
+  raster(RAT = TRUE)
+
+landclass_rast <- ratify(landclass_rast)
 
 tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
 
@@ -226,16 +228,17 @@ tmap_mode("view")
 tm_shape(stock_rast) +
   tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
 
-# colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
 # 
 # landclass_rast_fact <- ratify(landclass_rast)
 # rat <- levels(landclass_rast_fact)[[1]]
 # rat$names <- unique(levels(all_coord_clean$reclass_fact))
 # levels(landclass_rast_fact) <- rat
 # 
-# tm_shape(landclass_rast_fact) +
-#   tm_raster(n = 14, pal = colors, alpha = .6) +
-#   tm_basemap(leaflet::providers$CartoDB.Positron)
+
+tm_shape(landclass_rast) +
+   tm_raster(n = 14, pal = colors, alpha = .6) +
+   tm_basemap(leaflet::providers$CartoDB.Positron)
 
 plot(tif_stack)
 
@@ -248,6 +251,13 @@ ggplot() +
               y = y,
               fill = carbonstock_raster)) +
   theme_minimal()
+
+```
+
+```{r Gavi tmap attempt}
+
+tm_shape("")
+
 
 ```
 
