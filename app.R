@@ -97,8 +97,8 @@ ui <- fluidPage(theme = light_theme,
                                                 br(), 
                                                 br(),
                                              tabPanel(
-                                               leafletOutput(outputId = "out_maps",
-                                                                    height = 650))
+                                               leafletOutput(outputId = "out_maps"))
+                                             
                                       )
                                     )),
                            
