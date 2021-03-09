@@ -96,15 +96,10 @@ ui <- fluidPage(theme = light_theme,
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
-<<<<<<< HEAD
+
                                              tabPanel(
                                                leafletOutput(outputId = "out_maps"))
                                              
-=======
-                                                tabPanel(
-                                                  leafletOutput(outputId = "out_maps",
-                                                                height = 650))
->>>>>>> origin
                                       )
                                     )),
                            
