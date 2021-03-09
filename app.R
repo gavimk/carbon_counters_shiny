@@ -272,8 +272,11 @@ server <- function(input, output) {
   landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
     raster()
   
+<<<<<<< HEAD
   levels(landclass_rast)
   
+=======
+>>>>>>> 49de4fcc664398857b77098616a77f47c4f5b6da
   plot(landclass_rast)
   # 
   # tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)

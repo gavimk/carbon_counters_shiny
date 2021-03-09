@@ -204,7 +204,11 @@ n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
 landclass_rast <- here("data", "rasters", "landclass_raster.tif") %>% 
   raster(RAT = TRUE)
 
+<<<<<<< HEAD
 landclass_rast <- ratify(landclass_rast)
+=======
+
+>>>>>>> 49de4fcc664398857b77098616a77f47c4f5b6da
 
 tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
 
