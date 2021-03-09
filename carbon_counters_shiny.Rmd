@@ -14,9 +14,6 @@ library(sf) # for spatial data
 library(tmap) # for interactive maps
 library(janitor)
 library(wesanderson)
-library(raster)
-
-
 ```
 
 ```{r}
@@ -95,23 +92,6 @@ test <- barriers %>%
   filter(barrier == "Other") %>% 
   print(comment)
 
-library(googlesheets4)
-
-#get your token to access google drive
-#shiny_token <- gs_auth() 
-#saveRDS(shiny_token, "shiny_app_token.rds")
-
-gs4_auth()
-ss <- "https://docs.google.com/spreadsheets/d/1fVP5npbMgBwUumZBi67hiGN6CAAOLrn-2QaTWm1VQDw/edit?usp=sharing"
-dat <- read_sheet(ss)
-Sys.Date()
-newdata <- data.frame(Sys.Date(),("howdy"))
-ss %>% 
-  sheet_append(newdata)
-
-dat2 <- read_sheet(ss) %>% 
-  mutate("Date"=as.Date.(1614988800))
-
 ```
 
 
@@ -188,6 +168,7 @@ plot_grid(p1, p2)
 
 ## barriers and comments to uppercase
 
+<<<<<<< HEAD
 ```
 
 ```{r}
@@ -261,6 +242,11 @@ ggplot() +
 ```{r Gavi tmap attempt}
 
 tm_shape("")
+=======
+  barriers <- read_csv(here("data","barriers.csv")) %>% 
+    rename("Barrier" = barrier) %>% 
+    rename("Comment" = comment)
+>>>>>>> origin
 
 
 ```
