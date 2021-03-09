@@ -40,16 +40,16 @@ ui <- fluidPage(theme = light_theme,
                 navbarPage("CARBON COUNTERS",
                            
                            tabPanel("Home", icon = icon("home"),
-
+                                    
                                     titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
                                     mainPanel(align = "left",
                                               br(),
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
-
+                                              
                                               "Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
-
+                                              
                                               br(),
                                               br(),
                                               img(src = "farms1.jpg", height = 400, width = 700),
@@ -78,33 +78,39 @@ ui <- fluidPage(theme = light_theme,
                            
                            # Inventory Tab
                            tabPanel("Carbon Inventory", icon = icon("tree"),
-
+                                    
                                     sidebarLayout(
                                       sidebarPanel(
                                         radioButtons(inputId = "select_map",
-                                                           label = h4("Select Results to View"),
-                                                           br(),
-                                                           choices = list(
-                                                             "Land Cover Classifications" = landclass_rast,
-                                                             "Total Carbon Stock" = stock_rast,
-                                                             "Soil Carbon" = soil_rast,
-                                                            "Aboveground Carbon" = abv_rast,
-                                                            "Nitrous Oxide Emissions" = n2o_rast
-                                                                          )),
+                                                     label = h4("Select Results to View"),
+                                                     br(),
+                                                     choices = list(
+                                                       "Land Cover Classifications" = landclass_rast,
+                                                       "Total Carbon Stock" = stock_rast,
+                                                       "Soil Carbon" = soil_rast,
+                                                       "Aboveground Carbon" = abv_rast,
+                                                       "Nitrous Oxide Emissions" = n2o_rast
+                                                     )),
                                       ),
                                       mainPanel(h3("Land Cover, Carbon Stocks, and Nitrous Oxide Emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
+<<<<<<< HEAD
                                              tabPanel(
                                                leafletOutput(outputId = "out_maps"))
                                              
+=======
+                                                tabPanel(
+                                                  leafletOutput(outputId = "out_maps",
+                                                                height = 650))
+>>>>>>> origin
                                       )
                                     )),
                            
                            # Projections Tab
                            tabPanel("Projections", icon = icon("chart-line"),
-
+                                    
                                     sidebarLayout(
                                       sidebarPanel(
                                         radioButtons("variable",
@@ -115,9 +121,9 @@ ui <- fluidPage(theme = light_theme,
                                       ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
                                                 "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
-
+                                                
                                                 ###this blurb could go below the graphs if we prefer 
-
+                                                
                                                 br(),
                                                 br(),
                                                 plotOutput("projection_plot"),
@@ -161,7 +167,7 @@ ui <- fluidPage(theme = light_theme,
                            
                            # Barriers Tab
                            tabPanel("Barriers", icon = icon("comments"),
-
+                                    
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
                                                                label = h4("Select a barrier"),
@@ -223,7 +229,7 @@ ui <- fluidPage(theme = light_theme,
                                               h4("Minnie Ringland, Co-Project Manager"),
                                               img(src = "minnie.JPG", height = 300),
                                               br(),
-
+                                              
                                               ("Minnie is a Buffalo native with a background in biology and experience in industrial compliance. Interested in environmental law and policy, with an emphasis on inclusive implementation strategies."),
                                               br(),
                                               br(),
@@ -281,37 +287,37 @@ server <- function(input, output) {
   
   output$out_maps <- renderLeaflet({
     
-     if(input$select_map == "stock_rast"){
-       maps <-
-         tm_shape(stock_rast) +
-         tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
-     }
+    if(input$select_map == "stock_rast"){
+      maps <-
+        tm_shape(stock_rast) +
+        tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
+    }
     
-     else if(input$select_map == "soil_rast"){
-       maps <-
-         tm_shape(soil_rast) +
-         tm_raster(style = "cont", title = "test")
-     }
+    else if(input$select_map == "soil_rast"){
+      maps <-
+        tm_shape(soil_rast) +
+        tm_raster(style = "cont", title = "test")
+    }
     
-     else if(input$select_map == "abv_rast"){
-       maps <-
-         tm_shape(abv_rast) +
-         tm_raster(style = "cont", title = "test")
-     }
+    else if(input$select_map == "abv_rast"){
+      maps <-
+        tm_shape(abv_rast) +
+        tm_raster(style = "cont", title = "test")
+    }
     
-     else if(input$select_map == "n2o_rast"){
-       maps <-
-         tm_shape(n2o_rast) +
-         tm_raster(style = "cont", title = "test")
-     }
+    else if(input$select_map == "n2o_rast"){
+      maps <-
+        tm_shape(n2o_rast) +
+        tm_raster(style = "cont", title = "test")
+    }
     
-     else if(input$select_map == "landclass_rast"){
-       maps <-
-         tm_shape(landclass_rast) +
-         tm_raster(n = 14, pal = colors, alpha = .6, title = "test")
-     }
-     tmap_mode("view")
-     tmap_leaflet(maps)
+    else if(input$select_map == "landclass_rast"){
+      maps <-
+        tm_shape(landclass_rast) +
+        tm_raster(n = 14, pal = colors, alpha = .6, title = "test")
+    }
+    tmap_mode("view")
+    tmap_leaflet(maps)
   })
   
   ## projection code
@@ -442,11 +448,10 @@ server <- function(input, output) {
   output$submitthanks <- renderUI({
     to_be_done_at_submit()
   })
- 
+  
   output$print_feedback <- renderPrint({
     input$barrier_feedback
   })
 }
 
 shinyApp(ui = ui, server = server)
-

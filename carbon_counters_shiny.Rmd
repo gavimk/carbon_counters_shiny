@@ -14,9 +14,6 @@ library(sf) # for spatial data
 library(tmap) # for interactive maps
 library(janitor)
 library(wesanderson)
-library(raster)
-
-
 ```
 
 ```{r}
@@ -95,23 +92,6 @@ test <- barriers %>%
   filter(barrier == "Other") %>% 
   print(comment)
 
-library(googlesheets4)
-
-#get your token to access google drive
-#shiny_token <- gs_auth() 
-#saveRDS(shiny_token, "shiny_app_token.rds")
-
-gs4_auth()
-ss <- "https://docs.google.com/spreadsheets/d/1fVP5npbMgBwUumZBi67hiGN6CAAOLrn-2QaTWm1VQDw/edit?usp=sharing"
-dat <- read_sheet(ss)
-Sys.Date()
-newdata <- data.frame(Sys.Date(),("howdy"))
-ss %>% 
-  sheet_append(newdata)
-
-dat2 <- read_sheet(ss) %>% 
-  mutate("Date"=as.Date.(1614988800))
-
 ```
 
 
@@ -188,61 +168,9 @@ plot_grid(p1, p2)
 
 ## barriers and comments to uppercase
 
-```
-
-```{r}
-## Spatial
-
-stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>% 
-  raster()
-soil_rast <- here("data", "rasters", "soil_raster.tif")%>% 
-  raster()
-abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>% 
-  raster()
-n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>% 
-  raster()
-landclass_rast <- here("data", "rasters", "landclass_raster.tif") %>% 
-  raster(RAT = TRUE)
-
-tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
-
-tmap_mode("view")
-
-tm_shape(stock_rast) +
-  tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
-
-colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
-# 
-# landclass_rast_fact <- ratify(landclass_rast)
-# rat <- levels(landclass_rast_fact)[[1]]
-# rat$names <- unique(levels(all_coord_clean$reclass_fact))
-# levels(landclass_rast_fact) <- rat
-
-tm_shape(landclass_rast) +
-   tm_raster(n = 14, pal = colors, alpha = .6) +
-   tm_basemap(leaflet::providers$CartoDB.Positron)
-
-plot(tif_stack)
-
-stock_df <- rasterToPoints(stock_rast)%>%
-  as.data.frame()
-
-maps_df <- rasterToPoints(tif_stack) %>% 
-  as.data.frame()
-
-##render plot 
-ggplot() +
-  geom_raster(maps_df,
-              aes(x = x,
-              y = y,
-              fill = input$select_map)) +
-  theme_minimal()
-
-```
-
-```{r Gavi tmap attempt}
-
-tm_shape("")
+  barriers <- read_csv(here("data","barriers.csv")) %>% 
+    rename("Barrier" = barrier) %>% 
+    rename("Comment" = comment)
 
 
 ```
