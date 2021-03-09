@@ -142,7 +142,7 @@ ui <- fluidPage(theme = light_theme,
                                                            selected = "Reduced Till"
                                         ),
                                         hr(),
-                                        radioButtons(inputId = "level",
+                                        checkboxGroupInput(inputId = "level",
                                                      label = h4("Select Implementation Level"),
                                                      choices = list("High",
                                                                     "Low")),
@@ -271,15 +271,11 @@ server <- function(input, output) {
   n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
     raster()
   landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
-    raster()
+    raster(RAT = TRUE)
   
-<<<<<<< HEAD
-<<<<<<< HEAD
-  levels(landclass_rast)
+  # levels(landclass_rast)
   
-=======
->>>>>>> 49de4fcc664398857b77098616a77f47c4f5b6da
-  plot(landclass_rast)
+  # plot(landclass_rast)
   # 
   # tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
   # 
@@ -291,7 +287,7 @@ server <- function(input, output) {
   #       tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
   #   }
   #   
-  #   else({
+  #   elseif(input$select_landcover == "soil"){
   #     tm_shape(soil_rast) 
   #   })
   #   
@@ -299,40 +295,44 @@ server <- function(input, output) {
   #   tmap_leaflet(ci_plot)
   ##   
   # }) 
-=======
-  tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
-  maps_df <- rasterToPoints(tif_stack) %>% 
-    as.data.frame()
->>>>>>> origin
-  
-  colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
-  
+
+   # tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
+   # maps_df <- rasterToPoints(tif_stack) %>% 
+     # as.data.frame()
+  # 
+   colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+  # 
   output$out_maps <- renderLeaflet({
+    # have actualy tmap code here, ifelse outside of renderleaflet
+    # store maps as reactive element based on input selections
+    # my_layer <- reactive ({ if() else if ()})
+    # tmap(my_layer())
     
+
     if(input$select_map == "stock_rast"){
       maps <-
         tm_shape(stock_rast) +
         tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
     }
-    
+
     else if(input$select_map == "soil_rast"){
       maps <-
         tm_shape(soil_rast) +
         tm_raster(style = "cont", title = "test")
     }
-    
+
     else if(input$select_map == "abv_rast"){
       maps <-
         tm_shape(abv_rast) +
         tm_raster(style = "cont", title = "test")
     }
-    
+
     else if(input$select_map == "n2o_rast"){
       maps <-
         tm_shape(n2o_rast) +
         tm_raster(style = "cont", title = "test")
     }
-    
+
     else if(input$select_map == "landclass_rast"){
       maps <-
         tm_shape(landclass_rast) +
@@ -402,7 +402,7 @@ server <- function(input, output) {
   
   mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
     clean_names() %>% 
-    dplyr::select(-2) %>% 
+    dplyr:: select(-2) %>% 
     rename_at(.vars = vars(starts_with("x")),
               .funs = funs(sub("x", "", .))) %>% 
     pivot_longer(cols = 2:16, 
@@ -416,8 +416,8 @@ server <- function(input, output) {
   
   mgmt_practice_react <- reactive({ 
     mgmt_practice %>% 
-      filter(practice == input$practice) %>% 
-      filter(level == input$level)
+      filter(practice %in% input$practice) %>% 
+      filter(level %in% input$level)
   })
   
   baseline <- mgmt_xl %>% 
@@ -429,7 +429,7 @@ server <- function(input, output) {
   output$mgmt_plot <- renderPlot({
     ggplot() +
       geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
-      geom_smooth(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
+      geom_line(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
       theme_minimal() + 
       scale_color_manual(values = wes_colors) +
       labs(x = "Year",
@@ -442,7 +442,7 @@ server <- function(input, output) {
   ## barriers code
   
   barriers <- read_csv(here("data","barriers.csv")) %>%   
-    rename("Stakeholder Comments" = 3)
+    rename("Stakeholder Comments" = 2)
   
   barriers_react <- reactive({
     barriers %>% 
@@ -451,7 +451,7 @@ server <- function(input, output) {
   
   output$selected_barrier <- renderTable({
     barriers_react() %>% 
-      dplyr::select(3)
+      dplyr::select(2)
   })
   
   to_be_done_at_submit <- eventReactive(input$submitbutton, {

@@ -23,7 +23,7 @@ library(wesanderson)
 ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
 
 ca_subset <- ca_counties %>% 
-  select(NAME, ALAND) %>% 
+  dplyr::select(NAME, ALAND) %>% 
   rename(county_name = NAME, land_area = ALAND)
 
 # Set viewing mode to "interactive":
@@ -47,7 +47,7 @@ matrix <- data.frame("year" = c(2016,2030),
                      )
 
 matrix2 <- matrix %>% 
-  select(year,Acreage) %>% 
+  dplyr::select(year,Acreage) %>% 
   rename(new=Acreage)
 
 ggplot(data = matrix) +
@@ -122,7 +122,7 @@ plot_project_react <- ggplot() +
 
 mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
   clean_names() %>% 
-  select(-2) %>% 
+  dplyr:: select(-2) %>% 
   rename_at(.vars = vars(starts_with("x")),
             .funs = funs(sub("x", "", .))) %>% 
   pivot_longer(cols = 2:16, 
@@ -136,7 +136,7 @@ mgmt_practice <- mgmt_xl %>%
 
 baseline <- mgmt_xl %>% 
   slice(1:15) %>% 
-  select(!level)
+  dplyr::select(!level)
 
 wes_colors <- wes_palette("Darjeeling1", 7, type = "continuous")
 
