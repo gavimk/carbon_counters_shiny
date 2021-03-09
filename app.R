@@ -99,7 +99,6 @@ ui <- fluidPage(theme = light_theme,
                                              tabPanel(
                                                leafletOutput(outputId = "out_maps",
                                                                     height = 650))
-                                           
                                       )
                                     )),
                            
@@ -241,6 +240,7 @@ ui <- fluidPage(theme = light_theme,
 
 
 ### Server Interface
+
 server <- function(input, output) {
   
   # # inventory code
@@ -261,12 +261,13 @@ server <- function(input, output) {
   # })
   
   ## Trying new maps 
+  
   stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>%
     raster()
   soil_rast <- here("data", "rasters", "soil_raster.tif")%>%
     raster()
   abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>%
-      raster()
+    raster()
   n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
     raster()
   landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
@@ -309,10 +310,8 @@ server <- function(input, output) {
          tm_shape(landclass_rast) +
          tm_raster(n = 14, pal = colors, alpha = .6, title = "test")
      }
-
      tmap_mode("view")
      tmap_leaflet(maps)
-  
   })
   
   ## projection code

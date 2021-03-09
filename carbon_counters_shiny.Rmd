@@ -217,7 +217,6 @@ colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "d
 # rat <- levels(landclass_rast_fact)[[1]]
 # rat$names <- unique(levels(all_coord_clean$reclass_fact))
 # levels(landclass_rast_fact) <- rat
-# 
 
 tm_shape(landclass_rast) +
    tm_raster(n = 14, pal = colors, alpha = .6) +
@@ -238,7 +237,6 @@ ggplot() +
               y = y,
               fill = input$select_map)) +
   theme_minimal()
-
 
 ```
 
