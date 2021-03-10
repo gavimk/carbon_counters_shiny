@@ -89,8 +89,7 @@ ui <- fluidPage(theme = light_theme,
                                                        "Total Carbon Stock" = stock_rast,
                                                        "Soil Carbon" = soil_rast,
                                                        "Aboveground Carbon" = abv_rast,
-                                                       "Nitrous Oxide Emissions" = n2o_rast
-                                                     )),
+                                                       "Nitrous Oxide Emissions" = n2o_rast))
                                       ),
                                       mainPanel(h3("Land Cover, Carbon Stocks, and Nitrous Oxide Emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
@@ -131,7 +130,7 @@ ui <- fluidPage(theme = light_theme,
                                     sidebarLayout(
                                       sidebarPanel(
                                         checkboxGroupInput(inputId = "practice",
-                                                           label = h4("Select a Management Practice (up to 3)"), 
+                                                           label = h4("Select a Management Practice"), 
                                                            ## or we need to figure out why it's breaking past 3
                                                            choices = list("Reduced Till",
                                                                           "Restoration",
@@ -143,10 +142,11 @@ ui <- fluidPage(theme = light_theme,
                                                            selected = "Reduced Till"
                                         ),
                                         hr(),
-                                        radioButtons(inputId = "level",
+                                        checkboxGroupInput(inputId = "level",
                                                      label = h4("Select Implementation Level"),
                                                      choices = list("High",
-                                                                    "Low")),
+                                                                    "Low"),
+                                                     selected = "High"),
                                         #sliderInput("acres_slide",
                                         # label = h4("Percent of 2030 Acreage"),
                                         # min = 0, 
@@ -244,25 +244,6 @@ ui <- fluidPage(theme = light_theme,
 
 server <- function(input, output) {
   
-  # # inventory code
-  # ca_counties <- read_sf(here("data","ca_counties", "CA_Counties_TIGER2016.shp"))
-  # 
-  # ca_subset <- ca_counties %>%
-  #   select(NAME, ALAND) %>%
-  #   rename(county_name = NAME, land_area = ALAND)
-  # 
-  # mycols <- c("blue", "red", "green", "purple") # colors not working
-  # 
-  # output$ci_plot <- renderLeaflet({
-  #   map <- tm_shape(ca_subset) +
-  #     tm_fill(col=mycols[input$select_landcover])
-  
-  #   tmap_leaflet(map)
-  #   
-  # })
-  
-  ## Trying new maps 
-  
   stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>%
     raster()
   soil_rast <- here("data", "rasters", "soil_raster.tif")%>%
@@ -272,48 +253,47 @@ server <- function(input, output) {
   n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
     raster()
   landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
-    raster()
+    raster(RAT = TRUE)
   
-  tif_stack <- stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
-  maps_df <- rasterToPoints(tif_stack) %>% 
-    as.data.frame()
+   colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
   
-  colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
-  
-  output$out_maps <- renderLeaflet({
-    
-    if(input$select_map == "stock_rast"){
-      maps <-
-        tm_shape(stock_rast) +
-        tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
-    }
-    
-    else if(input$select_map == "soil_rast"){
-      maps <-
-        tm_shape(soil_rast) +
-        tm_raster(style = "cont", title = "test")
-    }
-    
-    else if(input$select_map == "abv_rast"){
-      maps <-
-        tm_shape(abv_rast) +
-        tm_raster(style = "cont", title = "test")
-    }
-    
-    else if(input$select_map == "n2o_rast"){
-      maps <-
+   mylayer <- reactive({
+     if(input$select_map == "stock_rast"){
+       tm_shape(stock_rast) +
+         tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")}
+       
+     else if(input$select_map == "soil_rast"){
+         tm_shape(soil_rast) +
+         tm_raster(style = "cont", title = "test")}
+     
+     else if(input$select_map == "abv_rast"){
+         tm_shape(abv_rast) +
+         tm_raster(style = "cont", title = "test")}
+     
+     else if(input$select_map == "n2o_rast"){
         tm_shape(n2o_rast) +
-        tm_raster(style = "cont", title = "test")
-    }
-    
-    else if(input$select_map == "landclass_rast"){
-      maps <-
+         tm_raster(style = "cont", title = "test")}
+     
+     else if(input$select_map == "landclass_rast"){
         tm_shape(landclass_rast) +
-        tm_raster(n = 14, pal = colors, alpha = .6, title = "test")
-    }
+         tm_raster(n = 14, pal = colors, alpha = .6, title = "test")}
+   })
+        # map_list <- c(stock_map, soil_map, abv_map, n2o_map, land_map) %>% 
+        #   as.data.frame(map_list)
+        # 
+        # map_list_react <- reactive({
+        #   map_list %>% 
+            
+   output$out_maps <- renderLeaflet({
+    # have actualy tmap code here, ifelse outside of renderleaflet
+    # store maps as reactive element based on input selections
+    # my_layer <- reactive ({ if() else if ()})
+    # tmap(my_layer())
+  
     tmap_mode("view")
-    tmap_leaflet(maps)
+    tmap_leaflet(mylayer())
   })
+   
   
   ## projection code
   
@@ -375,7 +355,7 @@ server <- function(input, output) {
   
   mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
     clean_names() %>% 
-    dplyr::select(-2) %>% 
+    dplyr:: select(-2) %>% 
     rename_at(.vars = vars(starts_with("x")),
               .funs = funs(sub("x", "", .))) %>% 
     pivot_longer(cols = 2:16, 
@@ -389,8 +369,8 @@ server <- function(input, output) {
   
   mgmt_practice_react <- reactive({ 
     mgmt_practice %>% 
-      filter(practice == input$practice) %>% 
-      filter(level == input$level)
+      filter(practice %in% input$practice) %>% 
+      filter(level %in% input$level)
   })
   
   baseline <- mgmt_xl %>% 
@@ -402,7 +382,7 @@ server <- function(input, output) {
   output$mgmt_plot <- renderPlot({
     ggplot() +
       geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
-      geom_smooth(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
+      geom_line(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
       theme_minimal() + 
       scale_color_manual(values = wes_colors) +
       labs(x = "Year",
@@ -415,7 +395,7 @@ server <- function(input, output) {
   ## barriers code
   
   barriers <- read_csv(here("data","barriers.csv")) %>%   
-    rename("Stakeholder Comments" = 3)
+    rename("Stakeholder Comments" = 2)
   
   barriers_react <- reactive({
     barriers %>% 
@@ -424,7 +404,7 @@ server <- function(input, output) {
   
   output$selected_barrier <- renderTable({
     barriers_react() %>% 
-      dplyr::select(3)
+      dplyr::select(2)
   })
   
   to_be_done_at_submit <- eventReactive(input$submitbutton, {
