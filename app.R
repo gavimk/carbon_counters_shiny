@@ -14,8 +14,24 @@ library(janitor)
 library(wesanderson)
 library(googlesheets4)
 library(raster)
+library(RColorBrewer)
+library(colorspace)
 
-# library(shinydashboard)
+### Raster inputs ####
+
+stock_rast <- raster(here("data", "rasters", "carbonstock_raster.tif"))
+
+soil_rast <- raster(here("data", "rasters", "soil_raster.tif"))
+
+abv_rast <- raster(here("data", "rasters", "aboveground_raster.tif"))
+
+n2o_rast <- raster(here("data", "rasters", "n2o_raster.tif"))
+
+landclass_rast <- raster(here("data", "rasters", "landclass_raster.tif"), RAT = TRUE) 
+
+tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
+
+colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
 
 ### Set themes
 dark_theme <- bs_theme(
@@ -90,6 +106,7 @@ ui <- fluidPage(theme = light_theme,
                                                        "Soil Carbon" = "soil_raster",
                                                        "Aboveground Carbon" = "aboveground_raster",
                                                        "Nitrous Oxide Emissions" = "n2o_raster"))
+                                         # selected = "Land Cover Classifications") # Can't figure out selected =
                                       ),
                                       mainPanel(h3("Land cover, carbon stocks, and nitrous oxide emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
@@ -236,91 +253,44 @@ ui <- fluidPage(theme = light_theme,
 
 server <- function(input, output) {
   
-  stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>%
-    raster()
-  soil_rast <- here("data", "rasters", "soil_raster.tif")%>%
-    raster()
-  abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>%
-    raster()
-  n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
-    raster()
-  landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
-    raster(RAT = TRUE)
+  # reactive_rasters <- reactive({
+  #   subset <- raster::subset(tif_stack, input$select_map)
+  # })
   
-  tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
-  
-  stacked_df <- rasterToPoints(tif_stack)%>%
-    as.data.frame()
-  
-#  raster::rasterFromXYZ(reactive_rasters, crs = crs(stock_rast))
-  
-  reactive_rasters <- reactive({
-    message('yup it worked')
-    subset <- raster::subset(stacked_df, input$select_map, class(subset), return(subset)) 
-  })
+  ### To do: black outline around county, choose basemaps, get legend outside of map and/or smaller, label categories in landclass, lump ag together? 
   
   output$out_maps <- renderTmap({
-    tm_shape(reactive_rasters) +
-      tm_raster(input$select_map, style = "cont", title = "test title", palette = "Greens")
-      
-    #   tm_raster(n = 14, pal = colors, alpha = .6) +
-    #   tm_basemap(leaflet::providers$CartoDB.Positron)
-    # 
-    # tm_shape(carbonstock_raster) +
-    #   tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")
-    # 
-    # tm_shape(soil_raster) +
-    #   tm_raster(style = "cont", title = "test")
-    # 
-    # tm_shape(aboverground_raster) +
-    #   tm_raster(style = "cont", title = "test")
-    # 
-    # tm_shape(n2o_raster) +
-    #   tm_raster(style = "cont", title = "test")
     
-   # tmap_mode("view")
+    if(input$select_map == "landclass_raster"){
+      tm_shape(landclass_rast) +
+        tm_raster(n = 14, pal = colors, alpha = .8, style = "cat", title = "Land Cover Classifications", 
+                  labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))}
+      
+    else if(input$select_map == "carbonstock_raster"){
+          tm_shape(stock_rast) +
+            tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
+        tm_legend(legend.position = c("left", "bottom")) # not working 
+      }
+
+        else if(input$select_map == "soil_raster"){
+            tm_shape(soil_rast) +
+            tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = "Purples") + # would prefer browns
+            tm_style("watercolor") + 
+            tm_layout(legend.outside = TRUE, legend.outside.position = "right") +# not working 
+            tm_view(view.legend.position = "left")} # not working
+
+        else if(input$select_map == "aboveground_raster"){
+            tm_shape(abv_rast) +
+            tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
+            tm_basemap("CartoDB.VoyagerNoLabels") }
+
+        else if(input$select_map == "n2o_raster"){
+           tm_shape(n2o_rast) +
+            tm_raster(style = "cont", palette = "YlOrRd", title = "Nitrous Oxide Emissions (MTCO2e")+
+            tm_basemap()}
   })
-  
-   colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
-  
-   # mylayer <- reactive({
-   #   if(input$select_map == "stock_rast"){
-   #     tm_shape(stock_rast) +
-   #       tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Greens")}
-   #     
-   #   else if(input$select_map == "soil_rast"){
-   #       tm_shape(soil_rast) +
-   #       tm_raster(style = "cont", title = "test")}
-   #   
-   #   else if(input$select_map == "abv_rast"){
-   #       tm_shape(abv_rast) +
-   #       tm_raster(style = "cont", title = "test")}
-   #   
-   #   else if(input$select_map == "n2o_rast"){
-   #      tm_shape(n2o_rast) +
-   #       tm_raster(style = "cont", title = "test")}
-   #   
-   #   else if(input$select_map == "landclass_rast"){
-   #      tm_shape(landclass_rast) +
-   #       tm_raster(n = 14, pal = colors, alpha = .6, title = "test")}
-   # })
-        # map_list <- c(stock_map, soil_map, abv_map, n2o_map, land_map) %>% 
-        #   as.data.frame(map_list)
-        # 
-        # map_list_react <- reactive({
-        #   map_list %>% 
-            
-  # output$out_maps <- renderLeaflet({
-    # have actualy tmap code here, ifelse outside of renderleaflet
-    # store maps as reactive element based on input selections
-    # my_layer <- reactive ({ if() else if ()})
-    # tmap(my_layer())
-  
-  #   tmap_mode("view")
-  #   tmap_leaflet(mylayer())
-  # })
-   
-  
+    
   ## projection code
   
   project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
