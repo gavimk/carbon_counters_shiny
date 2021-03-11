@@ -13,6 +13,7 @@ library(mapview)
 library(janitor)
 library(wesanderson)
 library(googlesheets4)
+library(googledrive)
 library(raster)
 library(RColorBrewer)
 library(colorspace)
@@ -457,13 +458,13 @@ server <- function(input, output) {
   
   to_be_done_at_submit <- eventReactive(input$submitbutton, {
     #Collect data
-    dtData <- data.frame(Sys.Date(),input$barrier_feedback)
+    addtosheet <- data.frame(Sys.Date(),input$barrier_feedback)
     
     #Put data on drive
-    gs4_deauth()
-    sheets_deauth()
+    gs4_auth(email = "gp-cc-shiny@carbon-counters-shiny-feedback.iam.gserviceaccount.com",
+               path= "carbon-counters-shiny-feedback-6d47ae471bea.json")
     sheet_append(ss = "https://docs.google.com/spreadsheets/d/1fVP5npbMgBwUumZBi67hiGN6CAAOLrn-2QaTWm1VQDw/edit?usp=sharing", 
-                 data = dtData)
+                 data = addtosheet)
     
     #Say thank you
     h5("Thanks for your feedback!")
