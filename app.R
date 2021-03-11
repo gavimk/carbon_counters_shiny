@@ -19,6 +19,8 @@ library(colorspace)
 
 ### Raster inputs ####
 
+county_bound <- read_sf(here("data", "county_out"), layer = "CountyOutline")
+
 stock_rast <- raster(here("data", "rasters", "carbonstock_raster.tif"))
 
 soil_rast <- raster(here("data", "rasters", "soil_raster.tif"))
@@ -265,13 +267,17 @@ server <- function(input, output) {
     if(input$select_map == "landclass_raster"){
       tm_shape(landclass_rast) +
         tm_raster(n = 14, pal = colors, alpha = .8, style = "cat", title = "Land Cover Classifications", 
-                  labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))}
+                  labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))+
+        tm_shape(county_bound) +
+        tm_borders()}
     
     else if(input$select_map == "carbonstock_raster"){
       tm_shape(stock_rast) +
         tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
         tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
-        tm_layout(legend.position = c("left", "bottom")) # not working 
+        tm_layout(legend.position = c("left", "bottom")) +
+        tm_shape(county_bound) +
+        tm_borders()
     }
     
     else if(input$select_map == "soil_raster"){
@@ -279,17 +285,23 @@ server <- function(input, output) {
         tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = "Purples") + # would prefer browns
         tm_style("watercolor") + 
         # tm_legend(legend.outside = TRUE, legend.outside.position = "right") +# not working 
-        tm_view(legend.position = "left")} # not working
+        tm_view(legend.position = "left")+
+        tm_shape(county_bound) +
+        tm_borders()} # not working
     
     else if(input$select_map == "aboveground_raster"){
       tm_shape(abv_rast) +
         tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
-        tm_basemap("CartoDB.VoyagerNoLabels") }
+        tm_basemap("CartoDB.VoyagerNoLabels")+
+        tm_shape(county_bound) +
+        tm_borders()}
     
     else if(input$select_map == "n2o_raster"){
       tm_shape(n2o_rast) +
         tm_raster(style = "cont", palette = "YlOrRd", title = "Nitrous Oxide Emissions (MTCO2e")+
-        tm_basemap()}
+        tm_basemap()+
+        tm_shape(county_bound) +
+        tm_borders()}
   })
   
   ## projection code
