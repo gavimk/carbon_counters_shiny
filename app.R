@@ -16,6 +16,7 @@ library(googlesheets4)
 library(raster)
 library(RColorBrewer)
 library(colorspace)
+library(soilpalettes) # devtools::install_github("kaizadp/soilpalettes")
 
 ### Raster inputs ####
 
@@ -34,6 +35,9 @@ landclass_rast <- raster(here("data", "rasters", "landclass_raster.tif"), RAT = 
 tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
 
 colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+
+soil_pal <- soil_palette("vitrixerand", 5)
+n2o_pal <- soil_palette("rendoll", 5)
 
 ### Set themes
 dark_theme <- bs_theme(
@@ -309,7 +313,7 @@ server <- function(input, output) {
     
     else if(input$select_map == "soil_raster"){
       tm_shape(soil_rast) +
-        tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = "Purples") + # would prefer browns
+        tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = rev(soil_pal)) + # would prefer browns
         tm_style("watercolor") + 
         # tm_legend(legend.outside = TRUE, legend.outside.position = "right") +# not working 
         tm_view(legend.position = "left")+
@@ -325,7 +329,7 @@ server <- function(input, output) {
     
     else if(input$select_map == "n2o_raster"){
       tm_shape(n2o_rast) +
-        tm_raster(style = "cont", palette = "YlOrRd", title = "Nitrous Oxide Emissions (MTCO2e")+
+        tm_raster(style = "cont", palette = rev(n2o_pal), title = "Nitrous Oxide Emissions (MTCO2e")+
         tm_basemap()+
         tm_shape(county_bound) +
         tm_borders()}
