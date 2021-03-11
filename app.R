@@ -65,33 +65,35 @@ ui <- fluidPage(theme = light_theme,
                                               "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
                                               br(),
                                               br(),
-                                              
                                               "Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
-                                              
                                               br(),
                                               br(),
                                               img(src = "farms1.jpg", height = 400, width = 700),
                                               br(),
-                                              "Santa Maria Times",
+                                              em("Santa Maria Times"),
                                               br(),
                                               br(),
-                                              h2("Project Objectives"),
-                                              "1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands.",
+                                              h3("Purpose"),
                                               br(),
-                                              "2. Project land use change and resulting carbon stock and emissions to 2030, using a baseline trend from historical data.",
-                                              br(),
-                                              "3. Engage the agricultural community to ensure our modeling and recommendations are based in reality.",
-                                              br(),
-                                              "4. Assess the changes to forecasted stock and emissions from different land management scenarios.",
-                                              br(),
-                                              "5. Recommend realistic greenhouse gas reduction and management strategies to the County.",
+                                              strong("The purpose of this app to present the results of our work. We want stakeholders to be able to explore our findings in meaningful and productive ways. Specifically, planners and land managers will be able to interact with the outputs of each of our project objectives (below) to get information they can use when developing carbon sequestration targets, land management strategies, and carbon farm plans."),
                                               br(),
                                               br(),
-                                              h2("Climate Goals: Show Timeline Maybe"),
-                                              "State targets of reaching 40% below 1990 emissions levels by 2030, and reaching carbon neutrality by 2045. Santa Barbara County has set an equivalent target for 2030, to reduce emissions 50% below 2007 levels.",
+                                              h3("Project Objectives"),
+                                              strong("1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands."), "(see Carbon Inventory tab)",
                                               br(),
                                               br(),
-                                              img(src = "CountyMap.gif", height = 500, width = 700)
+                                              strong("2. Project land use change and resulting carbon stock and emissions to 2030, using a baseline trend from historical data."), "(see Projections tab)",
+                                              br(),
+                                              br(),
+                                              strong("3. Engage the agricultural community to ensure our modeling and recommendations are based in reality."), "(see Barriers tab)",
+                                              br(),
+                                              br(),
+                                              strong("4. Assess the changes to forecasted stock and emissions from different land management scenarios."), "(see Management Scenarios tab)",
+                                              br(),
+                                              br(),
+                                              strong("5. Recommend realistic greenhouse gas reduction and management strategies to the County."), "(see Final Report ", em("coming soon"),"!)",
+                                              br(),
+                                              br()
                                     )),
                            
                            # Inventory Tab
@@ -188,13 +190,22 @@ ui <- fluidPage(theme = light_theme,
                                       ),
                                       mainPanel(h3("Barriers to implementation of carbon-smart management practices"),
                                                 
-                                                "We wanted to understand the greatest barriers to implementing carbon-smart management practices so that our recommendations for the County are helpful and relevant. These comments were collected through an anonymous survey distributed in September 2020 to a network of agricultural stakeholders in the County, individual interviews with identified local experts, and group discussions with a regenerative agriculture advisory committee convened by the County.",
+                                                "We wanted to understand the greatest barriers to implementing carbon-smart management practices so that our recommendations for the County are targeted to addressing these issues. Throughout this project, we conducted an anonymous survey distributed in September 2020 to a network of agricultural stakeholders in the County, individual interviews with identified local experts, and group discussions with a regenerative agriculture advisory committee convened by the County.",
+                                                br(),
+                                                br(),
+                                                "You can peruse the comments we collected below. Use the dropdown menu on the left to select a barrier category.",
                                                 br(),
                                                 br(),
                                                 tableOutput("selected_barrier"),
                                                 br(),
+                                                br(),
+                                                "This information was incorporated into the management scenarios we chose to model (see Management Scenarios tab), as well as the recommendations we presented to the County in our project report.",
+                                                br(),
+                                                br(),
+                                                "However, we are always interested in collecting more information! Please feel free to weigh in on the ongoing discussion we hope will continue to inform County planning efforts. Your feedback will be stored anonymously in a Google spreadsheet that will be checked regularly and passed along to the County Sustainability Division.",
+                                                br(),
                                                 textInput("barrier_feedback",
-                                                          label = h4("Add your own comments")),
+                                                          label = h4("Add your own comments here:")),
                                                 verbatimTextOutput("print_feedback"),
                                                 actionButton("submitbutton", label = "Submit"),
                                                 hr(),
@@ -208,8 +219,9 @@ ui <- fluidPage(theme = light_theme,
                                               "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
                                               br(),
                                               br(),
-                                              ("You can find out more about our project at"),
-                                              (href="https://carboncounters.weebly.com/"),
+                                              ("You can find out more about our project on"),
+                                              a(href="https://carboncounters.weebly.com/","our website", style = "color:blue"),
+                                              "!",
                                               
                                               #### Haven't figured out how to make pics go next to each other
                                               
@@ -429,11 +441,12 @@ server <- function(input, output) {
     dtData <- data.frame(Sys.Date(),input$barrier_feedback)
     
     #Put data on drive
-    gs4_auth()
+    gs4_deauth()
+    sheets_deauth()
     sheet_append(ss = "https://docs.google.com/spreadsheets/d/1fVP5npbMgBwUumZBi67hiGN6CAAOLrn-2QaTWm1VQDw/edit?usp=sharing", 
                  data = dtData)
     
-    #Say thankyou
+    #Say thank you
     h5("Thanks for your feedback!")
   })
   
