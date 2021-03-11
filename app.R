@@ -33,25 +33,6 @@ tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_
 
 colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
 
-### Data
-
-stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>%
-  raster()
-
-soil_rast <- here("data", "rasters", "soil_raster.tif")%>%
-  raster()
-
-abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>%
-  raster()
-
-n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
-  raster()
-
-landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
-  raster(RAT = TRUE)
-
-colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
-
 ### Set themes
 dark_theme <- bs_theme(
   bg = "#053d57",
@@ -119,31 +100,22 @@ ui <- fluidPage(theme = light_theme,
                                         radioButtons(inputId = "select_map",
                                                      label = h4("Select results to view"),
                                                      br(),
-<<<<<<< HEAD
-                                                     choices = list(
-                                                       "Land Cover Classifications",
-                                                       "Total Carbon Stock",
-                                                       "Soil Carbon",
-                                                       "Aboveground Carbon",
-                                                       "Nitrous Oxide Emissions"))
-=======
                                                      choices = c(
                                                        "Land Cover Classifications" = "landclass_raster",
                                                        "Total Carbon Stock" = "carbonstock_raster",
                                                        "Soil Carbon" = "soil_raster",
                                                        "Aboveground Carbon" = "aboveground_raster",
-                                                       "Nitrous Oxide Emissions" = "n2o_raster"))
-                                         # selected = "Land Cover Classifications") # Can't figure out selected =
->>>>>>> origin
+                                                       "Nitrous Oxide Emissions" = "n2o_raster")),
+                                                     #selected = 1), # Alicia I also cannot get this to work, how weird
                                       ),
                                       mainPanel(h3("Land cover, carbon stocks, and nitrous oxide emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
-
-                                             mainPanel(
-                                               tmapOutput("out_maps"))
-                                             
+                                                
+                                                mainPanel(
+                                                  tmapOutput("out_maps"))
+                                                
                                       )
                                     )),
                            
@@ -156,11 +128,12 @@ ui <- fluidPage(theme = light_theme,
                                                      label = h4("Select a variable"),
                                                      choices = list("Acreage"= "Acres",
                                                                     "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
-                                                                    "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
+                                                                    "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)"),
+                                                     selected = "Acres"),
                                       ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
                                                 "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
-                                              
+                                                
                                                 
                                                 br(),
                                                 br(),
@@ -186,19 +159,10 @@ ui <- fluidPage(theme = light_theme,
                                         ),
                                         hr(),
                                         checkboxGroupInput(inputId = "level",
-                                                     label = h4("Select implementation level"),
-                                                     choices = list("High",
-                                                                    "Low"),
-<<<<<<< HEAD
-                                                     selected = "High")
-                                        #sliderInput("acres_slide",
-                                        # label = h4("Percent of 2030 Acreage"),
-                                        # min = 0, 
-                                        # max = 100,
-                                        # value = 50)
-=======
-                                                     selected = "High"),
->>>>>>> origin
+                                                           label = h4("Select implementation level"),
+                                                           choices = list("High",
+                                                                          "Low"),
+                                                           selected = "High"),
                                       ),
                                       mainPanel(h3("Management scenarios: carbon stock change over time"),
                                                 "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
@@ -290,47 +254,6 @@ ui <- fluidPage(theme = light_theme,
 
 server <- function(input, output) {
   
-<<<<<<< HEAD
-  #inventory/reclass maps code
-  
-  map_react <- reactive({
-    
-    if(input$select_map == "Land Cover Classifications"){
-      tm_shape(landclass_rast) + 
-        tm_raster(n = 14, pal = colors, alpha = .6, title = "test")
-    }
-    
-    else if(input$select_map == "Nitrous Oxide Emissions"){
-      tm_shape(n2o_rast) +
-        tm_raster()
-    }
-    
-    else if(input$select_map == "Aboveground Carbon"){
-      tm_shape(abv_rast) +
-        tm_raster()
-    }
-    
-    else if(input$select_map == "Soil Carbon"){
-      tm_shape(soil_rast)+
-        tm_raster()
-    }
-    
-    else if(input$select_map == "Total Carbon Stock"){
-      tm_shape(stock_rast) +
-        tm_raster()
-    }
-    
-  })
-   
-   output$out_maps = renderLeaflet({
-     
-     tmap_mode("view")
-     
-     tmap_leaflet(map_react())
-     
-   })
-   
-=======
   # reactive_rasters <- reactive({
   #   subset <- raster::subset(tif_stack, input$select_map)
   # })
@@ -343,33 +266,32 @@ server <- function(input, output) {
       tm_shape(landclass_rast) +
         tm_raster(n = 14, pal = colors, alpha = .8, style = "cat", title = "Land Cover Classifications", 
                   labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))}
-      
-    else if(input$select_map == "carbonstock_raster"){
-          tm_shape(stock_rast) +
-            tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
-        tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
-        tm_legend(legend.position = c("left", "bottom")) # not working 
-      }
-
-        else if(input$select_map == "soil_raster"){
-            tm_shape(soil_rast) +
-            tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = "Purples") + # would prefer browns
-            tm_style("watercolor") + 
-            tm_layout(legend.outside = TRUE, legend.outside.position = "right") +# not working 
-            tm_view(view.legend.position = "left")} # not working
-
-        else if(input$select_map == "aboveground_raster"){
-            tm_shape(abv_rast) +
-            tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
-            tm_basemap("CartoDB.VoyagerNoLabels") }
-
-        else if(input$select_map == "n2o_raster"){
-           tm_shape(n2o_rast) +
-            tm_raster(style = "cont", palette = "YlOrRd", title = "Nitrous Oxide Emissions (MTCO2e")+
-            tm_basemap()}
-  })
     
->>>>>>> origin
+    else if(input$select_map == "carbonstock_raster"){
+      tm_shape(stock_rast) +
+        tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
+        tm_layout(legend.position = c("left", "bottom")) # not working 
+    }
+    
+    else if(input$select_map == "soil_raster"){
+      tm_shape(soil_rast) +
+        tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = "Purples") + # would prefer browns
+        tm_style("watercolor") + 
+        # tm_legend(legend.outside = TRUE, legend.outside.position = "right") +# not working 
+        tm_view(legend.position = "left")} # not working
+    
+    else if(input$select_map == "aboveground_raster"){
+      tm_shape(abv_rast) +
+        tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
+        tm_basemap("CartoDB.VoyagerNoLabels") }
+    
+    else if(input$select_map == "n2o_raster"){
+      tm_shape(n2o_rast) +
+        tm_raster(style = "cont", palette = "YlOrRd", title = "Nitrous Oxide Emissions (MTCO2e")+
+        tm_basemap()}
+  })
+  
   ## projection code
   
   project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
@@ -466,12 +388,12 @@ server <- function(input, output) {
            linetype = "Implementation Level") +
       scale_x_discrete(breaks = c(2016, 2018, 2020, 2022, 2024, 2026, 2028, 2030), labels = c("2016", "2018", "2020", "2022", "2024", "2026", "2028", "2030")) +
       theme(
-            axis.text.x = element_text(size = 14, angle = 0, hjust = .5, vjust = .5),
-            axis.text.y = element_text(size = 14, angle = 0, hjust = 1, vjust = 0),  
-            axis.title.x = element_text(size = 16, angle = 0, hjust = .5, vjust = 0, margin=margin(10,0,0,0)),
-            axis.title.y = element_text(size = 16, angle = 90, hjust = .5, vjust = .5, margin=margin(0,10,0,0)),
-            legend.text = element_text(size = 12, margin=margin(0,0,10,0)),
-            legend.title = element_text(size = 14))
+        axis.text.x = element_text(size = 14, angle = 0, hjust = .5, vjust = .5),
+        axis.text.y = element_text(size = 14, angle = 0, hjust = 1, vjust = 0),  
+        axis.title.x = element_text(size = 16, angle = 0, hjust = .5, vjust = 0, margin=margin(10,0,0,0)),
+        axis.title.y = element_text(size = 16, angle = 90, hjust = .5, vjust = .5, margin=margin(0,10,0,0)),
+        legend.text = element_text(size = 12, margin=margin(0,0,10,0)),
+        legend.title = element_text(size = 14))
   })
   
   
