@@ -33,6 +33,25 @@ tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_
 
 colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
 
+### Data
+
+stock_rast <- here("data", "rasters", "carbonstock_raster.tif")%>%
+  raster()
+
+soil_rast <- here("data", "rasters", "soil_raster.tif")%>%
+  raster()
+
+abv_rast <- here("data", "rasters", "aboveground_raster.tif")%>%
+  raster()
+
+n2o_rast <- here("data", "rasters", "n2o_raster.tif")%>%
+  raster()
+
+landclass_rast <- here("data", "rasters", "landclass_raster.tif")%>%
+  raster(RAT = TRUE)
+
+colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+
 ### Set themes
 dark_theme <- bs_theme(
   bg = "#053d57",
@@ -102,6 +121,14 @@ ui <- fluidPage(theme = light_theme,
                                         radioButtons(inputId = "select_map",
                                                      label = h4("Select results to view"),
                                                      br(),
+<<<<<<< HEAD
+                                                     choices = list(
+                                                       "Land Cover Classifications",
+                                                       "Total Carbon Stock",
+                                                       "Soil Carbon",
+                                                       "Aboveground Carbon",
+                                                       "Nitrous Oxide Emissions"))
+=======
                                                      choices = c(
                                                        "Land Cover Classifications" = "landclass_raster",
                                                        "Total Carbon Stock" = "carbonstock_raster",
@@ -109,6 +136,7 @@ ui <- fluidPage(theme = light_theme,
                                                        "Aboveground Carbon" = "aboveground_raster",
                                                        "Nitrous Oxide Emissions" = "n2o_raster"))
                                          # selected = "Land Cover Classifications") # Can't figure out selected =
+>>>>>>> origin
                                       ),
                                       mainPanel(h3("Land cover, carbon stocks, and nitrous oxide emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
@@ -163,7 +191,16 @@ ui <- fluidPage(theme = light_theme,
                                                      label = h4("Select implementation level"),
                                                      choices = list("High",
                                                                     "Low"),
+<<<<<<< HEAD
+                                                     selected = "High")
+                                        #sliderInput("acres_slide",
+                                        # label = h4("Percent of 2030 Acreage"),
+                                        # min = 0, 
+                                        # max = 100,
+                                        # value = 50)
+=======
                                                      selected = "High"),
+>>>>>>> origin
                                       ),
                                       mainPanel(h3("Management scenarios: carbon stock change over time"),
                                                 "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
@@ -265,6 +302,47 @@ ui <- fluidPage(theme = light_theme,
 
 server <- function(input, output) {
   
+<<<<<<< HEAD
+  #inventory/reclass maps code
+  
+  map_react <- reactive({
+    
+    if(input$select_map == "Land Cover Classifications"){
+      tm_shape(landclass_rast) + 
+        tm_raster(n = 14, pal = colors, alpha = .6, title = "test")
+    }
+    
+    else if(input$select_map == "Nitrous Oxide Emissions"){
+      tm_shape(n2o_rast) +
+        tm_raster()
+    }
+    
+    else if(input$select_map == "Aboveground Carbon"){
+      tm_shape(abv_rast) +
+        tm_raster()
+    }
+    
+    else if(input$select_map == "Soil Carbon"){
+      tm_shape(soil_rast)+
+        tm_raster()
+    }
+    
+    else if(input$select_map == "Total Carbon Stock"){
+      tm_shape(stock_rast) +
+        tm_raster()
+    }
+    
+  })
+   
+   output$out_maps = renderLeaflet({
+     
+     tmap_mode("view")
+     
+     tmap_leaflet(map_react())
+     
+   })
+   
+=======
   # reactive_rasters <- reactive({
   #   subset <- raster::subset(tif_stack, input$select_map)
   # })
@@ -303,6 +381,7 @@ server <- function(input, output) {
             tm_basemap()}
   })
     
+>>>>>>> origin
   ## projection code
   
   project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
