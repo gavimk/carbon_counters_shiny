@@ -17,8 +17,11 @@ library(googledrive)
 library(raster)
 library(RColorBrewer)
 library(colorspace)
+library(soilpalettes) # devtools::install_github("kaizadp/soilpalettes")
 
 ### Raster inputs ####
+
+county_bound <- read_sf(here("data", "county_out"), layer = "CountyOutline")
 
 stock_rast <- raster(here("data", "rasters", "carbonstock_raster.tif"))
 
@@ -33,6 +36,9 @@ landclass_rast <- raster(here("data", "rasters", "landclass_raster.tif"), RAT = 
 tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
 
 colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+
+soil_pal <- soil_palette("vitrixerand", 5)
+n2o_pal <- soil_palette("rendoll", 5)
 
 ### Set themes
 dark_theme <- bs_theme(
@@ -57,27 +63,22 @@ ui <- fluidPage(theme = light_theme,
                 navbarPage("CARBON COUNTERS",
                            
                            tabPanel("Home", icon = icon("home"),
-                                    
-                                    titlePanel("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands"),
-                                    mainPanel(align = "left",
+                                    h2("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands",
+                                       align = "center"),
                                               br(),
-                                              "Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan.",
-                                              br(),
-                                              br(),
-                                              "Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
+                                              p("Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan. Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
+                                                align = "justify"),
                                               br(),
                                               br(),
-                                              img(src = "farms1.jpg", height = 400, width = 700),
+                                              HTML('<center><img src = "farms1.jpg", height = "400", width = "700"></center>'),
                                               br(),
-                                              em("Santa Maria Times"),
+                                              p(em("Santa Maria Times"), align = "center"),
+                                              h3("Purpose",
+                                                 align = "center"),
                                               br(),
-                                              br(),
-                                              h3("Purpose"),
-                                              br(),
-                                              strong("The purpose of this app to present the results of our work. We want stakeholders to be able to explore our findings in meaningful and productive ways. Specifically, planners and land managers will be able to interact with the outputs of each of our project objectives (below) to get information they can use when developing carbon sequestration targets, land management strategies, and carbon farm plans."),
-                                              br(),
-                                              br(),
-                                              h3("Project Objectives"),
+                                              p("The purpose of this app to present the results of our work. We want stakeholders to be able to explore our findings in meaningful and productive ways. Specifically, planners and land managers will be able to interact with the outputs of each of our project objectives (below) to get information they can use when developing carbon sequestration targets, land management strategies, and carbon farm plans.", align = "justify"),
+                                              h3("Project Objectives",
+                                                 align = "center"),
                                               strong("1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands."), "(see Carbon Inventory tab)",
                                               br(),
                                               br(),
@@ -93,7 +94,7 @@ ui <- fluidPage(theme = light_theme,
                                               strong("5. Recommend realistic greenhouse gas reduction and management strategies to the County."), "(see Final Report ", em("coming soon"),"!)",
                                               br(),
                                               br()
-                                    )),
+                                    ),
                            
                            # Inventory Tab
                            tabPanel("Carbon Inventory", icon = icon("tree"),
@@ -108,17 +109,20 @@ ui <- fluidPage(theme = light_theme,
                                                        "Total Carbon Stock" = "carbonstock_raster",
                                                        "Soil Carbon" = "soil_raster",
                                                        "Aboveground Carbon" = "aboveground_raster",
-                                                       "Nitrous Oxide Emissions" = "n2o_raster"))
-                                         # selected = "Land Cover Classifications") # Can't figure out selected =
+                                                       "Nitrous Oxide Emissions" = "n2o_raster")),
+                                                     #selected = 1), # Alicia I also cannot get this to work, how weird
                                       ),
                                       mainPanel(h3("Land cover, carbon stocks, and nitrous oxide emissions in 2016"),
                                                 "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
                                                 br(), 
                                                 br(),
-
-                                             mainPanel(
-                                               tmapOutput("out_maps"))
-                                             
+                                                
+                                                mainPanel(
+                                                  tmapOutput("out_maps",
+                                                             height = 600,
+                                                             width = 800)
+                                                  )
+                                                
                                       )
                                     )),
                            
@@ -131,11 +135,12 @@ ui <- fluidPage(theme = light_theme,
                                                      label = h4("Select a variable"),
                                                      choices = list("Acreage"= "Acres",
                                                                     "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
-                                                                    "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)")),
+                                                                    "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)"),
+                                                     selected = "Acres"),
                                       ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class"),
                                                 "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
-                                              
+                                                
                                                 
                                                 br(),
                                                 br(),
@@ -161,10 +166,10 @@ ui <- fluidPage(theme = light_theme,
                                         ),
                                         hr(),
                                         checkboxGroupInput(inputId = "level",
-                                                     label = h4("Select implementation level"),
-                                                     choices = list("High",
-                                                                    "Low"),
-                                                     selected = "High"),
+                                                           label = h4("Select implementation level"),
+                                                           choices = list("High",
+                                                                          "Low"),
+                                                           selected = "High"),
                                       ),
                                       mainPanel(h3("Management scenarios: carbon stock change over time"),
                                                 "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
@@ -212,7 +217,7 @@ ui <- fluidPage(theme = light_theme,
                                     )),
                            
                            tabPanel("Carbon Counters", icon = icon("smile-beam"),
-                                    mainPanel(h2("Meet the team"),
+                                    h2("Meet the team"),
                                               br(),
                                               "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
                                               br(),
@@ -220,42 +225,59 @@ ui <- fluidPage(theme = light_theme,
                                               ("You can find out more about our project on"),
                                               a(href="https://carboncounters.weebly.com/","our website", style = "color:blue"),
                                               "!",
-                                              
+                                              br(),
+                                              br(),
                                               #### Haven't figured out how to make pics go next to each other
-                                              
-                                              h4("Alicia Fennell, Data and Outreach Manager"),
-                                              img(src = "alicia.jpeg", height = 300),
+                                    fluidRow(
+                                      column(2,
+                                             strong("Alicia Fennell", align = "center"),
+                                             br(),
+                                             "Data & Outreach Manager",
+                                              img(src = "alicia.jpeg", width = 200),
                                               br(),
+                                             br(),
                                               (" Alicia is a Goleta local with a background in outdoor and environmental education. Interested in climate action planning, sustainable food systems, and community-based solutions."),
+                                      ),
+                                              column(2,
+                                                strong("Gavi Keyles", align = "center"),
+                                                br(),
+                                                "Co-Project Manager",
+                                              img(src = "gavi.jpg", width = 200),
                                               br(),
-                                              br(),
-                                              h4("Gavi Keyles, Co-Project Manager"),
-                                              br(),
-                                              img(src = "gavi.jpg", height = 300),
                                               br(),
                                               ("Gavi is a New Jersey native with a background in renewable energy, project management, and environmental stakeholder engagement. She is passionate about creating climate solutions that make communities healthier, more equitable, and more resilient."),
+                                              ),
+
+                                            column(2,
+                                                   strong("Madeline Oliver", align = "center"),
+                                                   br(),
+                                                   "Editor & Outreach Manager",
+                                              img(src = "madi.jpg", width = 200),
                                               br(),
-                                              br(),
-                                              
-                                              h4("Madeline Oliver, Editor and Outreach Manager"),
-                                              img(src = "madi.jpg", height = 300),
                                               br(),
                                               ("Madi attributes her love for close-knit coastal and rural communities to her upbringing in Carmel, Hawaii and the Napa Valley. She is passionate about and experienced in sustainable urban planning, design and policy."),
+                                            ),
+
+                                            column(2,
+                                                   strong("Minnie Ringland", align = "center"),
+                                                   br(),
+                                                   "Co-Project Manager",
+                                              img(src = "minnie.JPG", width = 200),
                                               br(),
                                               br(),
-                                              h4("Minnie Ringland, Co-Project Manager"),
-                                              img(src = "minnie.JPG", height = 300),
-                                              br(),
-                                              
                                               ("Minnie is a Buffalo native with a background in biology and experience in industrial compliance. Interested in environmental law and policy, with an emphasis on inclusive implementation strategies."),
-                                              br(),
-                                              br(),
+                                            ),
                                               
-                                              h4("Michael Wells, Data and Finance Manager"),
-                                              img(src = "michael.PNG", height = 300),
+                                             column(2,
+                                               
+                                                    strong("Michael Wells", align = "center"),
+                                                    br(),
+                                                    "Data & Finance Manager",
+                                              img(src = "michael.PNG", width = 200),
+                                              br(),
                                               br(),
                                               ("Michael is from Dallas and has a background in tech and finance. He is interested in economics and policy of climate change.")
-                                              
+                                             )
                                     )
                            )
                 )
@@ -277,33 +299,43 @@ server <- function(input, output) {
     if(input$select_map == "landclass_raster"){
       tm_shape(landclass_rast) +
         tm_raster(n = 14, pal = colors, alpha = .8, style = "cat", title = "Land Cover Classifications", 
-                  labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))}
-      
-    else if(input$select_map == "carbonstock_raster"){
-          tm_shape(stock_rast) +
-            tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
-        tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
-        tm_legend(legend.position = c("left", "bottom")) # not working 
-      }
-
-        else if(input$select_map == "soil_raster"){
-            tm_shape(soil_rast) +
-            tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = "Purples") + # would prefer browns
-            tm_style("watercolor") + 
-            tm_layout(legend.outside = TRUE, legend.outside.position = "right") +# not working 
-            tm_view(view.legend.position = "left")} # not working
-
-        else if(input$select_map == "aboveground_raster"){
-            tm_shape(abv_rast) +
-            tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
-            tm_basemap("CartoDB.VoyagerNoLabels") }
-
-        else if(input$select_map == "n2o_raster"){
-           tm_shape(n2o_rast) +
-            tm_raster(style = "cont", palette = "YlOrRd", title = "Nitrous Oxide Emissions (MTCO2e")+
-            tm_basemap()}
-  })
+                  labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))+
+        tm_shape(county_bound) +
+        tm_borders()}
     
+    else if(input$select_map == "carbonstock_raster"){
+      tm_shape(stock_rast) +
+        tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
+        tm_layout(legend.position = c("left", "bottom")) +
+        tm_shape(county_bound) +
+        tm_borders()
+    }
+    
+    else if(input$select_map == "soil_raster"){
+      tm_shape(soil_rast) +
+        tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = rev(soil_pal)) + # would prefer browns
+        tm_style("watercolor") + 
+        # tm_legend(legend.outside = TRUE, legend.outside.position = "right") +# not working 
+        tm_view(legend.position = "left")+
+        tm_shape(county_bound) +
+        tm_borders()} # not working
+    
+    else if(input$select_map == "aboveground_raster"){
+      tm_shape(abv_rast) +
+        tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
+        tm_basemap("CartoDB.VoyagerNoLabels")+
+        tm_shape(county_bound) +
+        tm_borders()}
+    
+    else if(input$select_map == "n2o_raster"){
+      tm_shape(n2o_rast) +
+        tm_raster(style = "cont", palette = rev(n2o_pal), title = "Nitrous Oxide Emissions (MTCO2e")+
+        tm_basemap()+
+        tm_shape(county_bound) +
+        tm_borders()}
+  })
+  
   ## projection code
   
   project_obs <- read_csv(here("data", "shiny_observed_30.csv")) %>% 
@@ -400,12 +432,12 @@ server <- function(input, output) {
            linetype = "Implementation Level") +
       scale_x_discrete(breaks = c(2016, 2018, 2020, 2022, 2024, 2026, 2028, 2030), labels = c("2016", "2018", "2020", "2022", "2024", "2026", "2028", "2030")) +
       theme(
-            axis.text.x = element_text(size = 14, angle = 0, hjust = .5, vjust = .5),
-            axis.text.y = element_text(size = 14, angle = 0, hjust = 1, vjust = 0),  
-            axis.title.x = element_text(size = 16, angle = 0, hjust = .5, vjust = 0, margin=margin(10,0,0,0)),
-            axis.title.y = element_text(size = 16, angle = 90, hjust = .5, vjust = .5, margin=margin(0,10,0,0)),
-            legend.text = element_text(size = 12, margin=margin(0,0,10,0)),
-            legend.title = element_text(size = 14))
+        axis.text.x = element_text(size = 14, angle = 0, hjust = .5, vjust = .5),
+        axis.text.y = element_text(size = 14, angle = 0, hjust = 1, vjust = 0),  
+        axis.title.x = element_text(size = 16, angle = 0, hjust = .5, vjust = 0, margin=margin(10,0,0,0)),
+        axis.title.y = element_text(size = 16, angle = 90, hjust = .5, vjust = .5, margin=margin(0,10,0,0)),
+        legend.text = element_text(size = 12, margin=margin(0,0,10,0)),
+        legend.title = element_text(size = 14))
   })
   
   
