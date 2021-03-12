@@ -275,6 +275,7 @@ ui <- fluidPage(theme = light_theme,
                                               br(),
                                             
                                     fluidRow(
+                                      column(1),
                                       column(2,
                                              strong("Alicia Fennell", align = "center"),
                                              br(),
@@ -323,7 +324,8 @@ ui <- fluidPage(theme = light_theme,
                                               br(),
                                               br(),
                                               ("Michael is from Dallas and has a background in tech and finance. He is interested in economics and policy of climate change.")
-                                             )
+                                             ),
+                                      column(1)
                                     )
                            )
                 )
