@@ -56,7 +56,6 @@ ui <- fluidPage(theme = light_theme,
                                               #p(em("Santa Maria Times"), align = "center"),
                                     hr(),
                                               h3("Purpose", align = "center"),
-                                              br(),
                                               p("The purpose of this app to present the results of our work. We want stakeholders to be able to explore our findings in meaningful and productive ways. Specifically, planners and land managers will be able to interact with the outputs of each of our project objectives (below) to get information they can use when developing carbon sequestration targets, land management strategies, and carbon farm plans.", align = "justify"),
                                               h3("Project Objectives", align = "center"),
                                               "1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands.", em("(see Carbon Inventory tab)"),
@@ -181,14 +180,14 @@ ui <- fluidPage(theme = light_theme,
                                       sidebarPanel(
                                         checkboxGroupInput(inputId = "practice",
                                                            label = h4("Select a management practice to implement"), 
-                                                           choices = list("Compost Low N",
-                                                                          "Compost High N",
+                                                           choices = list("Compost C:N < 11",
+                                                                          "Compost C:N > 11",
                                                                           "Cover Crops",
                                                                           "Hedgerow Planting" = "Hedgerow",
                                                                           "Mulching",
                                                                           "Reduced Till",
                                                                           "Restoration"),
-                                                           selected = "Compost Low N"
+                                                           selected = "Compost C:N < 11"
                                         ),
                                         hr(),
                                         checkboxGroupInput(inputId = "level",
@@ -468,7 +467,7 @@ server <- function(input, output) {
       geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black", size = 0.7) +
       geom_line(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level)), size = 1) + 
       theme_minimal() + 
-      scale_color_manual(values = c("Reduced Till" = "green3", "Restoration" = "chocolate1", "Mulching" = "violetred3", "Cover Crops" = "cyan4", "Hedgerow" = "goldenrod", "Compost Low N" = "mediumorchid3", "Compost High N" = "deepskyblue2")) +
+      scale_color_manual(values = c("Reduced Till" = "green3", "Restoration" = "chocolate1", "Mulching" = "violetred3", "Cover Crops" = "cyan4", "Hedgerow" = "goldenrod", "Compost C:N > 11" = "mediumorchid3", "Compost C:N < 11" = "deepskyblue2")) +
       labs(x = "Year",
            y = "Carbon Stock (million MT C)",
            color = "Management Practice",
