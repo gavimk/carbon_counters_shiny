@@ -19,28 +19,6 @@ library(RColorBrewer)
 library(colorspace)
 library(soilpalettes) # devtools::install_github("kaizadp/soilpalettes")
 
-### Raster inputs ####
-
-county_bound <- read_sf(here("data", "county_out"), layer = "CountyOutline")
-
-stock_rast <- raster(here("data", "rasters", "carbonstock_raster.tif"))
-
-soil_rast <- raster(here("data", "rasters", "soil_raster.tif"))
-
-abv_rast <- raster(here("data", "rasters", "aboveground_raster.tif"))
-
-n2o_rast <- raster(here("data", "rasters", "n2o_raster.tif"))
-
-landclass_rast <- raster(here("data", "rasters", "landclass_raster.tif"), RAT = TRUE) 
-
-tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
-
-colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
-
-colors_2 <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "olivedrab3", "slategrey", "darkred", "tan4", "skyblue1", "sienna2", "burlywood2", "purple4", "dodgerblue4")
-
-soil_pal <- soil_palette("vitrixerand", 5)
-n2o_pal <- soil_palette("rendoll", 5)
 
 ### Set themes
 dark_theme <- bs_theme(
@@ -68,43 +46,46 @@ ui <- fluidPage(theme = light_theme,
                                     h2("Evaluating the Climate Mitigation Potential of Santa Barbara County's Natural and Working Lands",
                                        align = "center"),
                                               br(),
-                                              p("Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan. Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into county planning for increased carbon storage into the future.",
-                                                align = "justify"),
+                                    fluidRow(
+                                      column(width=3),
+                                      column(width = 6,
+                                             p("Acknowledging the significant role that natural and working lands (NWL) can play in reducing greenhouse gas emissions, the County of Santa Barbara is adding a NWL component to the 2022 update of its Climate Action Plan. Our team’s role is to quantify the carbon storage potential of these lands, evaluate how certain management practices can influence that potential, and help integrate that information into County planning for increased carbon storage into the future.", align = "justify"),
                                               br(),
                                               br(),
-                                              HTML('<center><img src = "farms1.jpg", height = "400", width = "700"></center>'),
-                                              br(),
-                                              p(em("Santa Maria Times"), align = "center"),
-                                              h3("Purpose",
-                                                 align = "center"),
+                                              HTML('<center><img src = "farms1.jpg", height = "400", width = "700"><figcaption>Santa Maria Times<figcaption></center>'),
+                                              #p(em("Santa Maria Times"), align = "center"),
+                                    hr(),
+                                              h3("Purpose", align = "center"),
                                               br(),
                                               p("The purpose of this app to present the results of our work. We want stakeholders to be able to explore our findings in meaningful and productive ways. Specifically, planners and land managers will be able to interact with the outputs of each of our project objectives (below) to get information they can use when developing carbon sequestration targets, land management strategies, and carbon farm plans.", align = "justify"),
-                                              h3("Project Objectives",
-                                                 align = "center"),
-                                              strong("1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands."), "(see Carbon Inventory tab)",
+                                              h3("Project Objectives", align = "center"),
+                                              "1. Calculate a countywide carbon inventory by accounting for carbon stock and emissions associated with Santa Barbara County’s natural and working lands.", em("(see Carbon Inventory tab)"),
                                               br(),
                                               br(),
-                                              strong("2. Project land use change and resulting carbon stock and emissions to 2030, using a baseline trend from historical data."), "(see Projections tab)",
+                                              "2. Project land use change and resulting carbon stock and emissions to 2030, using a baseline trend from historical data.", em("(see Projections tab)"),
                                               br(),
                                               br(),
-                                              strong("3. Engage the agricultural community to ensure our modeling and recommendations are based in reality."), "(see Barriers tab)",
+                                              "3. Assess the changes to forecasted stock and emissions from different land management scenarios.", em("(see Management Scenarios tab)"),
                                               br(),
                                               br(),
-                                              strong("4. Assess the changes to forecasted stock and emissions from different land management scenarios."), "(see Management Scenarios tab)",
+                                              "4. Engage the agricultural community to ensure our modeling and recommendations are based in reality.", em("(see Barriers tab)"),
                                               br(),
                                               br(),
-                                              strong("5. Recommend realistic greenhouse gas reduction and management strategies to the County."), "(see Final Report ", em("coming soon"),"!)",
+                                              "5. Recommend realistic greenhouse gas reduction and management strategies to the County.", em("(see Final Report - coming soon!)"),
                                               br(),
                                               br()
+                                      ),
+                                    column(width=3)
+                                    )
                                     ),
                            
-                           # Inventory Tab
+                           ## Inventory Tab
                            tabPanel("Carbon Inventory", icon = icon("tree"),
                                     
                                     sidebarLayout(
                                       sidebarPanel(
                                         radioButtons(inputId = "select_map",
-                                                     label = h4("Select results to view"),
+                                                     label = h4("Select results to map"),
                                                      br(),
                                                      choices = c(
                                                        "Land Cover Classifications" = "landclass_raster",
@@ -112,11 +93,20 @@ ui <- fluidPage(theme = light_theme,
                                                        "Soil Carbon" = "soil_raster",
                                                        "Aboveground Carbon" = "aboveground_raster",
                                                        "Nitrous Oxide Emissions" = "n2o_raster")),
-                                                     #selected = 1), # Alicia I also cannot get this to work, how weird
+                                                     #selected = 1), # not working
                                       ),
                                       mainPanel(h3("Land cover, carbon stocks, and nitrous oxide emissions in 2016", 
                                                    align = "center"),
-                                                "Our team used spatial data from Cal Ag Pesticide Use Reporting and LANDFIRE to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from SSURGO and methodology from CARB, we estimated carbon stocks and emissions for each 30x30 meter section of the county.",
+                                                br(),
+                                                "Our team used spatial data from",
+                                                a(href="https://www.cdpr.ca.gov/docs/pur/purmain.htm", "Cal Ag Pesticide Use Reporting", style = "color:blue"),
+                                                "and",
+                                                a(href="https://www.landfire.gov/vegetation.php", "LANDFIRE", style = "color:blue"),
+                                                "to reclassify all natural and working lands in the county into broad land use categories. Then, using spatial soil data from",
+                                                a(href="https://www.nrcs.usda.gov/wps/portal/nrcs/detail/soils/survey/?cid=nrcs142p2_053627", "SSURGO", style = "color:blue"),
+                                                "and methodology from",
+                                                a(href="https://ww3.arb.ca.gov/cc/inventory/pubs/arb_pc173_v004.pdf", "CARB", style = "color:blue"),
+                                                ", we estimated carbon stocks and emissions for each 30 meter x 30 meter section of the county.",
                                                 align = "justify",
                                                 br(), 
                                                 br(),
@@ -141,24 +131,25 @@ ui <- fluidPage(theme = light_theme,
                                                 #### Is this right?? anyone remember? 
                                                 br(),
                                                 br(),
-                                                strong("Aboveground Carbon"),
+                                                strong("Aboveground Carbon:"),
                                                 "Carbon density estimates used are published by the California Air Resources Board. We used these estimates with LANDFIRE's Existing Vegetation Height (EVH), Existing Vegetation Cover (EVC) and EVT (mentioned above).",
                                                 br(),
                                                 br(),
-                                                strong("Nitrous Oxide Emissions"),
+                                                strong("Nitrous Oxide Emissions:"),
                                                 "Nitrous oxide (N2O) emissions were estimated using IPCC methodology, data on fertilizer application rates provided by our client, and crop types from Cal Ag spatial data. Row crops emit the most nitrous oxide per acre, followed by orchards.",
-                                                br()
+                                                br(),
+                                                br(),
                                                 
                                       )
                                     )),
                            
-                           # Projections Tab
+                           ## Projections Tab
                            tabPanel("Projections", icon = icon("chart-line"),
                                     
                                     sidebarLayout(
                                       sidebarPanel(
                                         radioButtons("variable",
-                                                     label = h4("Select a variable"),
+                                                     label = h4("Select a variable to project"),
                                                      choices = list("Acreage"= "Acres",
                                                                     "Carbon Stock"= "Total Carbon Stock (MT Carbon)",
                                                                     "N2O Emissions"= "Nitrous Oxide Emissions (MTCO2e)"),
@@ -166,6 +157,7 @@ ui <- fluidPage(theme = light_theme,
                                       ),
                                       mainPanel(h3("Santa Barbara County's working lands in 2030 by land class", 
                                                    align = "center"),
+                                                br(),
                                                 "Based on three years of historical data (2012, 2016, and 2019), we used simple linear regressions to estimate the expected acreage, carbon stock, and nitrous oxide emissions of working lands in 2030. Carbon stock includes carbon stored in both soil and biomass, and nitrous oxide estimates are based on fertilizer application rates.",
                                                 align = "justify",
                                                 br(),
@@ -174,20 +166,21 @@ ui <- fluidPage(theme = light_theme,
                                                            height = 550),
                                                 br(),
                                                 br(),
-                                                "Working lands are projected to decrease slightly over the next decade. Because of that projection, carbon stocks on working lands are also projected to decrease; however, it's important to note that this does not necessarily reflect a county-wide decrease in carbon. For example, if agricultural land is being developed into urban land, that could result in a net decrease in carbon, but if agricultural land is being fallowed and allowed to become shrubland, that might result in a net increase in carbon.",
+                                                "Working lands are projected to decrease slightly over the next decade. Because of that projection, carbon stocks on working lands are also projected to decrease. However, it's important to note that this does not necessarily reflect a county-wide decrease in carbon. For example, if agricultural land is developed into urban land, that could result in a net decrease in carbon, but if agricultural land is fallowed and allowed to become shrubland, that might result in a net increase in carbon.",
                                                 br(),
                                                 br(),
-                                                "These projections serve as the baseline trends we will use to compare against potential increases in carbon sequestration from land management practices. On the next tab (Management Scenarios), we will explore avenues for increasing the county's carbon stocks through carbon-smart management practices.",
+                                                "These projections serve as the baseline trends we use to compare against potential increases in carbon sequestration from land management practices. In the Management Scenarios tab, we explore pathways to increasing the county's carbon stocks through carbon-smart management practices.",
                                                 br(),
+                                                br()
                                       )
                                     )),
                            
-                           # Scenarios Tab
+                           ## Scenarios Tab
                            tabPanel("Management Scenarios", icon = icon("seedling"),
                                     sidebarLayout(
                                       sidebarPanel(
                                         checkboxGroupInput(inputId = "practice",
-                                                           label = h4("Select a management practice"), 
+                                                           label = h4("Select a management practice to implement"), 
                                                            choices = list("Compost",
                                                                           "Cover Crops",
                                                                           "Hedgerow Planting" = "Hedgerow",
@@ -206,20 +199,23 @@ ui <- fluidPage(theme = light_theme,
                                       ),
                                       mainPanel(h3("Management scenarios: carbon stock change over time",
                                                    align = "center"),
-                                                "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
+                                                br(),
+                                                "Our team used USDA's ",
+                                                a(href="http://comet-planner-cdfahsp.com/","COMET-Planner tool", style = "color:blue"),
+                                                "to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
                                                 br(),
                                                 align = "justify",
                                                 br(),
                                                 plotOutput("mgmt_plot",
                                                            height = 550),
                                                 br(),
-                                                "We found that compost application yielded the most sequestered carbon--an additional 168 thousand MT C under the low scenario, and up to 336 thousand MT C under the high scenario. After composting, hedgerow planting had the next highest potential for emissions reductions and carbon sequestration. These scenarios were all modeled independently, and the highest implementation rate used was 20%. If management practices were implemented in tandem or at higher levels, we would see higher emissions reductions, CO2 sequestration, and total carbon stocks. More detail on implementation rates and scenario modeling can be found in our final report.",
+                                                "We found that compost application yielded the most sequestered carbon -- an additional 168 thousand MT C under the low scenario, and up to 336 thousand MT C under the high scenario. After composting, hedgerow planting had the next highest potential for emissions reductions and carbon sequestration. These scenarios were all modeled independently, and the highest implementation rate used was 20%. If management practices were implemented in tandem or at higher levels, we would see even higher emissions reductions, CO2 sequestration, and total carbon stocks. More detail on implementation rates and scenario modeling can be found in our final report.",
                                                 br(),
                                                 br()
                                       )
                                     )),
                            
-                           # Barriers Tab
+                           ## Barriers Tab
                            tabPanel("Barriers", icon = icon("comments"),
                                     sidebarLayout(
                                       sidebarPanel(selectInput("select_barrier",
@@ -233,10 +229,9 @@ ui <- fluidPage(theme = light_theme,
                                       ),
                                       mainPanel(h3("Barriers to implementation of carbon-smart management practices",
                                                    align = "center"),
-                                                
+                                                br(),
                                                 "We wanted to understand the greatest barriers to implementing carbon-smart management practices so that our recommendations for the County are targeted to addressing these issues. Throughout this project, we conducted an anonymous survey distributed in September 2020 to a network of agricultural stakeholders in the County, individual interviews with identified local experts, and group discussions with a regenerative agriculture advisory committee convened by the County.",
                                                 align = "justify",
-                                                
                                                 br(),
                                                 br(),
                                                 "You can peruse the comments we collected below. Use the dropdown menu on the left to select a barrier category.",
@@ -244,7 +239,7 @@ ui <- fluidPage(theme = light_theme,
                                                 br(),
                                                 br(),
                                                 tableOutput("selected_barrier"),
-                                                br(),
+                                                hr(),
                                                 br(),
                                                 "This information was incorporated into the management scenarios we chose to model (see Management Scenarios tab), as well as the recommendations we presented to the County in our project report.",
                                                 align = "justify",
@@ -253,25 +248,28 @@ ui <- fluidPage(theme = light_theme,
                                                 "However, we are always interested in collecting more information! Please feel free to weigh in on the ongoing discussion we hope will continue to inform County planning efforts. Your feedback will be stored anonymously in a Google spreadsheet that will be checked regularly and passed along to the County Sustainability Division.",
                                                 align = "justify",
                                                 br(),
-                                                textInput("barrier_feedback",
-                                                          label = h4("Add your own comments here:")),
-                                                verbatimTextOutput("print_feedback"),
-                                                actionButton("submitbutton", label = "Submit"),
-                                                hr(),
-                                                uiOutput("submitthanks")
+                                                br(),
+                                                wellPanel(textInput("barrier_feedback",
+                                                                    label = h4("Add your own comments here:")),
+                                                actionButton("submitbutton", label = "Submit")),
+                                                br(),
+                                                #verbatimTextOutput("print_feedback"), # can't figure out how to format nicer
+                                                uiOutput("submitthanks"),
+                                                br()
                                       )
                                     )),
                            
+                           ## About Us Tab
                            tabPanel("Carbon Counters", icon = icon("smile-beam"),
                                     h3("Meet the team",
                                        align = "center"),
                                               br(),
-                                              "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara. For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
+                                              "Hello! We are a team of five master's students at the Bren School of Environmental Science & Management at UC Santa Barbara.",
                                               br(),
+                                              "For the past year, we have been working with the County of Santa Barbara to support an update to its Climate Action Plan.",
                                               br(),
                                               ("You can find out more about our project on"),
-                                              a(href="https://carboncounters.weebly.com/","our website", style = "color:blue"),
-                                              "!",
+                                              a(href="https://carboncounters.weebly.com/","our website!", style = "color:blue"),
                                               br(),
                                               br(),
                                             
@@ -335,11 +333,7 @@ ui <- fluidPage(theme = light_theme,
 
 server <- function(input, output) {
   
-  # reactive_rasters <- reactive({
-  #   subset <- raster::subset(tif_stack, input$select_map)
-  # })
-  
-  ### To do: black outline around county, choose basemaps, get legend outside of map and/or smaller, label categories in landclass, lump ag together? 
+  ## inventory code 
   
   output$out_maps <- renderTmap({
     
@@ -527,5 +521,18 @@ server <- function(input, output) {
     input$barrier_feedback
   })
 }
+
+### Raster inputs ####
+county_bound <- read_sf(here("data", "county_out"), layer = "CountyOutline")
+stock_rast <- raster(here("data", "rasters", "carbonstock_raster.tif"))
+soil_rast <- raster(here("data", "rasters", "soil_raster.tif"))
+abv_rast <- raster(here("data", "rasters", "aboveground_raster.tif"))
+n2o_rast <- raster(here("data", "rasters", "n2o_raster.tif"))
+landclass_rast <- raster(here("data", "rasters", "landclass_raster.tif"), RAT = TRUE) 
+tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_rast)
+colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
+colors_2 <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "olivedrab3", "slategrey", "darkred", "tan4", "skyblue1", "sienna2", "burlywood2", "purple4", "dodgerblue4")
+soil_pal <- soil_palette("vitrixerand", 5)
+n2o_pal <- soil_palette("rendoll", 5)
 
 shinyApp(ui = ui, server = server)
