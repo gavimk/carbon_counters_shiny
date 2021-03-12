@@ -37,6 +37,8 @@ tif_stack <- raster::stack(stock_rast, soil_rast, abv_rast, n2o_rast, landclass_
 
 colors <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "darkolivegreen3", "lightslategrey", "darkred", "sandybrown", "cornflowerblue", "chartreuse3", "burlywood3", "purple4", "dodgerblue4") 
 
+colors_2 <- c("gainsboro", "black", "lightsteelblue", "goldenrod", "darkgreen", "olivedrab3", "slategrey", "darkred", "tan4", "skyblue1", "sienna2", "burlywood2", "purple4", "dodgerblue4")
+
 soil_pal <- soil_palette("vitrixerand", 5)
 n2o_pal <- soil_palette("rendoll", 5)
 
@@ -144,7 +146,8 @@ ui <- fluidPage(theme = light_theme,
                                                 
                                                 br(),
                                                 br(),
-                                                plotOutput("projection_plot"),
+                                                plotOutput("projection_plot", 
+                                                           height = 550),
                                                 br()
                                       )
                                     )),
@@ -155,14 +158,14 @@ ui <- fluidPage(theme = light_theme,
                                       sidebarPanel(
                                         checkboxGroupInput(inputId = "practice",
                                                            label = h4("Select a management practice"), 
-                                                           choices = list("Reduced Till",
-                                                                          "Restoration",
-                                                                          "Mulching",
+                                                           choices = list("Compost",
                                                                           "Cover Crops",
                                                                           "Hedgerow Planting" = "Hedgerow",
-                                                                          "Compost",
+                                                                          "Mulching",
+                                                                          "Reduced Till",
+                                                                          "Restoration",
                                                                           "Tree/Shrub Establishment"),
-                                                           selected = "Reduced Till"
+                                                           selected = "Compost"
                                         ),
                                         hr(),
                                         checkboxGroupInput(inputId = "level",
@@ -174,7 +177,8 @@ ui <- fluidPage(theme = light_theme,
                                       mainPanel(h3("Management scenarios: carbon stock change over time"),
                                                 "Our team used USDA's COMET-Planner tool to model how future carbon stocks on working lands might be influenced by increased adoption of carbon-smart management practices. We developed high and low future implementation scenarios for each practice we modeled.",
                                                 br(),
-                                                plotOutput("mgmt_plot") 
+                                                plotOutput("mgmt_plot",
+                                                           height = 550) 
                                       )
                                     )),
                            
@@ -298,15 +302,16 @@ server <- function(input, output) {
     
     if(input$select_map == "landclass_raster"){
       tm_shape(landclass_rast) +
-        tm_raster(n = 14, pal = colors, alpha = .8, style = "cat", title = "Land Cover Classifications", 
+        tm_raster(n = 14, pal = colors_2, style = "cat", title = "Land Cover Classifications", 
                   labels = c("Barren", "Developed", "Fallow", "Fodder", "Forest", "Grassland", "Greenhouse", "Orchard", "Pastureland", "Riparian/Wetland", "Row Crop", "Shrubland", "Vineyard", "Water"))+
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.7) +
         tm_shape(county_bound) +
         tm_borders()}
     
     else if(input$select_map == "carbonstock_raster"){
       tm_shape(stock_rast) +
         tm_raster(style = "cont", title = "Total Carbon Stocks (MT Carbon)", palette = "Blues") +
-        tm_basemap("Esri.WorldTopoMap", alpha = 0.5) +
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.7) +
         tm_layout(legend.position = c("left", "bottom")) +
         tm_shape(county_bound) +
         tm_borders()
@@ -314,8 +319,8 @@ server <- function(input, output) {
     
     else if(input$select_map == "soil_raster"){
       tm_shape(soil_rast) +
-        tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = rev(soil_pal)) + # would prefer browns
-        tm_style("watercolor") + 
+        tm_raster(style = "cont", title = "Soil Carbon Stocks (MT Carbon)", palette = rev(soil_pal)) +
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.7) +  
         # tm_legend(legend.outside = TRUE, legend.outside.position = "right") +# not working 
         tm_view(legend.position = "left")+
         tm_shape(county_bound) +
@@ -324,14 +329,15 @@ server <- function(input, output) {
     else if(input$select_map == "aboveground_raster"){
       tm_shape(abv_rast) +
         tm_raster(style = "cont", title = "Aboveground Carbon Stocks (MT Carbon)", palette = "Greens") +
-        tm_basemap("CartoDB.VoyagerNoLabels")+
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.7) +
         tm_shape(county_bound) +
         tm_borders()}
     
     else if(input$select_map == "n2o_raster"){
       tm_shape(n2o_rast) +
-        tm_raster(style = "cont", palette = rev(n2o_pal), title = "Nitrous Oxide Emissions (MTCO2e")+
-        tm_basemap()+
+        tm_raster(style = "cont", title = "Nitrous Oxide Emissions (MTCO2e", palette = "Oranges")+
+        # OR palette = rev(n2o_pal),
+        tm_basemap("Esri.WorldTopoMap", alpha = 0.7) +
         tm_shape(county_bound) +
         tm_borders()}
   })
@@ -422,10 +428,10 @@ server <- function(input, output) {
   
   output$mgmt_plot <- renderPlot({
     ggplot() +
-      geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black") +
-      geom_line(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level))) + 
+      geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black", size = 0.7) +
+      geom_line(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level)), size = 1) + 
       theme_minimal() + 
-      scale_color_manual(values = wes_colors) +
+      scale_color_manual(values = c("Reduced Till" = "green3", "Restoration" = "chocolate1", "Mulching" = "violetred3", "Cover Crops" = "cyan4", "Hedgerow" = "goldenrod", "Compost" = "mediumorchid3", "Tree/Shrub Establishment" = "deepskyblue2")) +
       labs(x = "Year",
            y = "Carbon Stock (million MT C)",
            color = "Management Practice",
