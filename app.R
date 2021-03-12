@@ -181,14 +181,14 @@ ui <- fluidPage(theme = light_theme,
                                       sidebarPanel(
                                         checkboxGroupInput(inputId = "practice",
                                                            label = h4("Select a management practice to implement"), 
-                                                           choices = list("Compost",
+                                                           choices = list("Compost Low N",
+                                                                          "Compost High N",
                                                                           "Cover Crops",
                                                                           "Hedgerow Planting" = "Hedgerow",
                                                                           "Mulching",
                                                                           "Reduced Till",
-                                                                          "Restoration",
-                                                                          "Tree/Shrub Establishment"),
-                                                           selected = "Compost"
+                                                                          "Restoration"),
+                                                           selected = "Compost Low N"
                                         ),
                                         hr(),
                                         checkboxGroupInput(inputId = "level",
@@ -437,7 +437,7 @@ server <- function(input, output) {
   
   ## mgmt practices code
   
-  mgmt_xl <- read_csv(here("data", "shiny_mgmt.csv")) %>% 
+  mgmt_xl <- read_csv(here("data", "shiny_mgmt2.csv")) %>% 
     clean_names() %>% 
     dplyr:: select(-2) %>% 
     rename_at(.vars = vars(starts_with("x")),
@@ -468,7 +468,7 @@ server <- function(input, output) {
       geom_line(data = baseline, aes(x = year, y = carbon_stock, group = 1), color = "black", size = 0.7) +
       geom_line(data = mgmt_practice_react(), aes(x = year, y = carbon_stock, color = practice, linetype = level, group = interaction(practice, level)), size = 1) + 
       theme_minimal() + 
-      scale_color_manual(values = c("Reduced Till" = "green3", "Restoration" = "chocolate1", "Mulching" = "violetred3", "Cover Crops" = "cyan4", "Hedgerow" = "goldenrod", "Compost" = "mediumorchid3", "Tree/Shrub Establishment" = "deepskyblue2")) +
+      scale_color_manual(values = c("Reduced Till" = "green3", "Restoration" = "chocolate1", "Mulching" = "violetred3", "Cover Crops" = "cyan4", "Hedgerow" = "goldenrod", "Compost Low N" = "mediumorchid3", "Compost High N" = "deepskyblue2")) +
       labs(x = "Year",
            y = "Carbon Stock (million MT C)",
            color = "Management Practice",
