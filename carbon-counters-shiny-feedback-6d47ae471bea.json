@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "carbon-counters-shiny-feedback",
+  "private_key_id": "6d47ae471bea1de96d33bb388bee2a546ab452b2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDxDzPI6K2YIHBV\naAWK67G4bIP7xQRKJh9nC7Tc93l8SiBDx/AnaLJGdLLshaKdvab7RLnMNfYx7bX9\n8YfvgV+UGuWR23OHoshXa61ViHmtRw7/hqcx3UMUz1WSHYjJxRP8PpMyqcYHJZhs\nzox2h47DMUJIx9u5oMCjHl2DnxgxHSdkKNWhQeEq4sgKQFMuzp7xOimbn5ZoJwD4\n43xv6aueSVvByVhAzctQ8z3DKYlMDDDQXR+85DDPtrdJsA0yDFsGWLLMGaEwZfWP\nxtjcmriqg4WCGYhCr8dlmKs9d9JLIHJY0WLIJwdWwq2pM5yyRDwFzyhpID92ttK2\n5PqQ7TWFAgMBAAECggEABP1QEJYEVdRCDvp+tt/nB06zsqfizVgZqUvcPAChUpnE\nLjL6vQ4VNpEezPd9JK+yv5uuDtSFGoZ1kGKJ8kKmxE2EN+8nZoTPicOwTEdtYVFJ\nta9HUahnRYx/FG2pEagTIFL5QAC0mRxFmebykFeA9HhWC2Sbny19H0M3I0zNNuL9\nz4rTHbXsafhQU7woC0sBNg6OLaF38IREIrYWRlEJwcXtkUoS9rJY0triLImZ79aB\ndtMclTvMpNUaFUCzy8WbTc45SRFYNIzPMHLMZE5+AMubESzh68t8Ab/nVQzgKMoh\nt2Usj1/UMROZINCSmq9znH1fsaQUOFGbd7HYaU+FwQKBgQD5+hyTSVPFIaZ/GweA\nRDeEdx9QhGiDspbzOFDUJ2cpVgchxYOkLOvoWxhDI0I6Mbrbwv8Rlvk1oGsI4Rnu\nLaJQRQfXJqFT1ZQJSLQbHEjcQ7Zi+Na4SrDCpJgY1FRCQX6yjk1ZeF7FjGx1BW/2\n9mAaQ01lu7N4LzljBPHrDLZG4QKBgQD23hXyynntoX2GuzuB9vE3h0PZt1Eymxpb\ngnERUx0Oue2dfqbY08DDH23kjyZYvTHaamR9PVdsrO/6lbsyFTqQewMWeOhBrIiP\nSK3+jp0aJ0ayeiw99aetnXH6T28C8AFV0bU05aXNjlz6ADMaOG+6uq2CUiB3kF5u\nmaPHHM7XJQKBgQCPDwY/fF2GmcVxRIS8cU3cb1fqenxdsl0VAIuxfoNZcrROLX0y\n/cpchZWTBqCmMUOg9S2IYYBpok7fHAP8/PzBN2BPTvpQwhAgaA063qsL82xzo7ku\nawBRxGSPASTfbiAWC75Uj8CdCcogBmaXTVSecxneONdy1oPfGTthqzq9wQKBgQC7\nkO3YNOMDHAoFzkhebMPFzu5Mgy4cZyBVmvxRj3aqc7YITexzHiB9oGmcmO8nyUgR\njXigd3TvS05idFVwrhR7JhuofWDqVS7EvxIEMVNIRcM/Y/gtc3JdRR0OdEACWVyK\nWfV2JW4eiiY2hORO7cZmd+PQ+plUfspg+jcn18mISQKBgQDddZjKgzthWR7CCEcp\nTGdmM0ZM0fEUmtyT+ahKm0cMGrJRXSF4OKDQNssvhiTABe0rg8jBXtCAG0pt8auD\n6crRJtYPgAp3QsNRXk9DKX3db/3WI1H8mRC/y2dAIPrqz0QZS/N2NEwu/A4Qi98f\nmHhuPBu3dFZhUQxoXTJe65SCqw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "gp-cc-shiny@carbon-counters-shiny-feedback.iam.gserviceaccount.com",
+  "client_id": "104790963088411912642",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gp-cc-shiny%40carbon-counters-shiny-feedback.iam.gserviceaccount.com"
+}
